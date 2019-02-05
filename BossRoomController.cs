@@ -12,11 +12,11 @@ public class BossRoomController : MonoBehaviour, IRoomTypeController {
     }
 
     public void OnPlayerEnter() {
-
+        Debug.Log("Player Entering Boss Room");
     }
 
     public void OnPlayerExit() {
-
+        Debug.Log("Player Exiting Boss Room");
     }
 
     public void OnRoomComplete() {

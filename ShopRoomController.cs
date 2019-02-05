@@ -12,11 +12,11 @@ public class ShopRoomController : MonoBehaviour, IRoomTypeController {
     }
 
     public void OnPlayerEnter() {
-
+        Debug.Log("Player Entering Shop Room");
     }
 
     public void OnPlayerExit() {
-
+        Debug.Log("Player Exiting Shop Room");
     }
 
     public void OnRoomComplete() {

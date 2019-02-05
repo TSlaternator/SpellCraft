@@ -12,11 +12,11 @@ public class GenericRoomController : MonoBehaviour, IRoomTypeController {
     }
 
     public void OnPlayerEnter() {
-
+        Debug.Log("Player Entering Generic Room");
     }
 
     public void OnPlayerExit() {
-
+        Debug.Log("Player Exiting Generic Room");
     }
 
     public void OnRoomComplete() {

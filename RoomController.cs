@@ -17,16 +17,19 @@ public class RoomController : MonoBehaviour
     private float threat, loot, essence; //variables used to determine room type
     private TileMapController tileGenerator; //allows spawning of floor tiles
     private IRoomTypeController roomTypeController; //allows different room types to have different designs
+    private BoxCollider roomBounds; //allows detection of the player entering or leaving the room
 
     //spawns the physical room
     public void SpawnRoom() {
 
-        //GameObject.Find("Player").GetComponent<PlayerController>().setStartPosition(new Vector3(xCentre, 0f, zCentre));
+        //set collider bounds
+        roomBounds = gameObject.GetComponent<BoxCollider>();
+        roomBounds.size = new Vector3(width + 2, 2f, height + 2);
 
         //sets up the roomTypeController
         switch (roomType) {
             case 0: roomTypeController = gameObject.AddComponent<SpawnRoomController>();
-                    GameObject.Find("Player").transform.position = new Vector3(xCentre, 0.5f, zCentre);
+                    GameObject.Find("Player").transform.position = new Vector3(xCentre, transform.position.y, zCentre);
                     GameObject.Find("CameraPosition").transform.position = new Vector3(xCentre, 10f, zCentre - 10f);
                     break;
             case 1: roomTypeController = gameObject.AddComponent<BossRoomController>(); break;
@@ -41,6 +44,14 @@ public class RoomController : MonoBehaviour
         SpawnWalls(roomTypeController.getWalls());
         tileGenerator.DrawRoom(xCentre, zCentre, width, height, roomTypeController.getTiles());
         roomTypeController.SpawnRoom(xCentre, zCentre, width, height);
+    }
+
+    void OnTriggerEnter(Collider other) {
+        if (other.tag == "Player") roomTypeController.OnPlayerEnter();
+    }
+
+    void OnTriggerExit(Collider other) {
+        if (other.tag == "Player") roomTypeController.OnPlayerExit();
     }
 
     //sets up the door variables

@@ -3,20 +3,20 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Tilemaps;
 
-public class LibraryRoomController : MonoBehaviour, IRoomTypeController {
+public class SpawnRoomController : MonoBehaviour, IRoomTypeController{
 
     public LevelGenerator generator;
 
     public void SpawnRoom(float xCentre, float zCentre, int width, int height) {
-        Instantiate(generator.libraryRoom.scribingTable, new Vector3(xCentre - 0.5f, 0f, zCentre - 0.5f), Quaternion.identity, transform);
+
     }
 
     public void OnPlayerEnter() {
-        Debug.Log("Player Entering Library");
+        Debug.Log("Player Entering Spawn Room");
     }
 
     public void OnPlayerExit() {
-        Debug.Log("Player Exiting Library");
+        Debug.Log("Player Exiting Spawn Room");
     }
 
     public void OnRoomComplete() {
@@ -25,10 +25,10 @@ public class LibraryRoomController : MonoBehaviour, IRoomTypeController {
 
     public GameObject[] getWalls() {
         generator = GameObject.Find("LevelManager").GetComponent<LevelGenerator>();
-        return generator.libraryRoom.walls;
+        return generator.genericRoom.walls;
     }
 
     public Tile[] getTiles() {
-        return generator.libraryRoom.floorTiles;
+        return generator.genericRoom.floorTiles;
     }
 }

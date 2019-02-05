@@ -14,13 +14,13 @@ public class Room{
     private RoomController controller; //controller attached to room game object
 
     //Constructor for the room
-	public Room(float xCentre, float zCentre, int width, int height, int depth){
-		this.xCentre = xCentre;
-		this.zCentre = zCentre;
-		this.width = width;
-		this.height = height;
-		this.depth = depth;
-	}
+    public Room(float xCentre, float zCentre, int width, int height, int depth) {
+        this.xCentre = xCentre;
+        this.zCentre = zCentre;
+        this.width = width;
+        this.height = height;
+        this.depth = depth;
+    }
 
     //sets the rooms pair
 	public void setPair(Room pair){

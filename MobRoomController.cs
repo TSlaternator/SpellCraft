@@ -12,11 +12,11 @@ public class MobRoomController : MonoBehaviour, IRoomTypeController{
     }
 
     public void OnPlayerEnter() {
-
+        Debug.Log("Player Entering Mob Room");
     }
 
     public void OnPlayerExit() {
-
+        Debug.Log("Player Exiting Mob Room");
     }
 
     public void OnRoomComplete() {
