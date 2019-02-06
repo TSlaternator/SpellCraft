@@ -4,9 +4,7 @@ using UnityEngine;
 
 public class RoomController : MonoBehaviour
 {
-    [SerializeField] private GameObject northWall; //wall at the top of the room
-    [SerializeField] private GameObject sideWalls; //walls on the left and right
-    [SerializeField] private GameObject southWall; //wall at the bottom of the room
+    [SerializeField] private GameObject floorPlane; //not visible in game, used to spawn a navmesh
     [SerializeField] private GameObject cornerWall; //walls at the corners of the room
     private bool[] doors; //which directions have doors (0 = N, 1 = E,  2 = S, 3 = W)
     private int[] doorCentres; //position of the door on direction corresponding to doors[]
@@ -21,6 +19,10 @@ public class RoomController : MonoBehaviour
 
     //spawns the physical room
     public void SpawnRoom() {
+
+        //spawning invisible plane, used to create a navmesh to help control enemy AI
+        GameObject floor = Instantiate(floorPlane, new Vector3(xCentre - 0.5f, -0.01f, zCentre - 0.5f), Quaternion.identity, gameObject.transform);
+        floor.transform.localScale = new Vector3((float)width / 10f, 0f, (float)height / 10f);
 
         //set collider bounds
         roomBounds = gameObject.GetComponent<BoxCollider>();
@@ -46,10 +48,12 @@ public class RoomController : MonoBehaviour
         roomTypeController.SpawnRoom(xCentre, zCentre, width, height);
     }
 
+    //allows the room to do something when the player enters
     void OnTriggerEnter(Collider other) {
         if (other.tag == "Player") roomTypeController.OnPlayerEnter();
     }
 
+    //allows the room to do something when the player exits
     void OnTriggerExit(Collider other) {
         if (other.tag == "Player") roomTypeController.OnPlayerExit();
     }

@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Tilemaps;
+using UnityEngine.AI;
 
 public class LevelGenerator : MonoBehaviour {
 
@@ -14,6 +15,7 @@ public class LevelGenerator : MonoBehaviour {
     [SerializeField] private GameObject coridoor; //empty gameObject with script to control coridoor creation
     [SerializeField] private GameObject room; //empty gameObject with script to control room creation
     [SerializeField] private TileMapController tileController; //controls the tileMap, used to refresh all tiles on a failed generation
+    [SerializeField] private NavMeshSurface[] navmeshes; //nav mesh surfaces, should be baked after the rooms have spawned
     public GenericRoom genericRoom; //struct to hold generic room properties
     public BossRoom bossRoom; //struct to hold boss room properties
     public LibraryRoom libraryRoom; //struct to hold library room properties
@@ -39,6 +41,7 @@ public class LevelGenerator : MonoBehaviour {
 				SpawnCoridoorsWithinGroups();
 				SpawnCoridoorsBetweenGroups();
                 BuildRooms();
+                BuildNavMesh();
             } catch {
 				spawnFailed = true;
 			}
@@ -51,9 +54,19 @@ public class LevelGenerator : MonoBehaviour {
 				}
                 while (roomList.childCount > 0) roomList.GetChild(0).parent = null;
                 tileController.ResetTiles(levelWidth, levelHeight);
+                for (int i = 0; i < navmeshes.Length; i++) {
+                    navmeshes[i].RemoveData();
+                }
 			}
 		}
 	}
+
+    //builds the navmesh after generating the level
+    private void BuildNavMesh() {
+        for(int i = 0; i < navmeshes.Length; i++) {
+            navmeshes[i].BuildNavMesh();
+        }
+    }
 
     //splits the SubLevel into smaller SubLevels until they're the correct size
 	private void SplitLevel(SubLevel level){
