@@ -7,6 +7,8 @@ public class CoridoorController : MonoBehaviour {
     private float xCentre, zCentre; //centre of the coridoor
     private int width, height; //dimensions of the coridoor
     private bool isHorizontal; //if the coridoor is horizontal or vertical
+    private bool explored = false; //true once the player enters the coridoor for the first time
+    private BoxCollider col; //the boxCollider attatched to the coridoor
     private TileMapController tileGenerator; //allows spawning of ground tiles
     [SerializeField] private GameObject northWall; //walls along the north side of the coridoors
     [SerializeField] private GameObject sideWalls; //walls along the sides of the coridoors
@@ -20,6 +22,14 @@ public class CoridoorController : MonoBehaviour {
         SpawnWalls();
     }
 
+    //removes fog of war when the player first enters
+    private void OnTriggerEnter(Collider other) {
+        if (other.tag == "Player" && !explored) {
+            explored = true;
+            tileGenerator.RemoveFog(xCentre, zCentre, width, height);
+        }
+    }
+
     //sets the dimensions of the coridoor
     public void setVariables(int width, int height, bool isHorizontal) {
         this.width = width;
@@ -28,6 +38,9 @@ public class CoridoorController : MonoBehaviour {
         xCentre = gameObject.transform.position.x;
         zCentre = gameObject.transform.position.z;
         tileGenerator = GameObject.Find("LevelManager").GetComponent<TileMapController>();
+        tileGenerator.DrawFog(xCentre, zCentre, width, height);
+        col = GetComponent<BoxCollider>();
+        col.size = (new Vector3(width, 2f, height));
     }
 
     //lets the attached rooms know where the door is (so they know to leave room for it!)
