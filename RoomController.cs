@@ -31,9 +31,10 @@ public class RoomController : MonoBehaviour
         //sets up the roomTypeController
         switch (roomType) {
             case 0: roomTypeController = gameObject.AddComponent<SpawnRoomController>();
-                    GameObject.Find("Player").transform.position = new Vector3(xCentre, transform.position.y, zCentre);
-                    GameObject.Find("CameraPosition").transform.position = new Vector3(xCentre, 10f, zCentre - 10f);
-                    break;
+                Debug.Log("Spawn Room");
+                GameObject.Find("Player").transform.position = new Vector3(xCentre, transform.position.y, zCentre);
+                GameObject.Find("CameraPosition").transform.position = new Vector3(xCentre, 10f, zCentre - 10f);
+                break;
             case 1: roomTypeController = gameObject.AddComponent<BossRoomController>(); break;
             case 2: roomTypeController = gameObject.AddComponent<ShopRoomController>(); break;
             case 3: roomTypeController = gameObject.AddComponent<LibraryRoomController>(); break;

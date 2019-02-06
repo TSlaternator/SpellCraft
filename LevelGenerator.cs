@@ -25,6 +25,7 @@ public class LevelGenerator : MonoBehaviour {
     public MobRoom mobRoom; //struct to hold mob room properties
 	private bool spawnFailed = true; //if true when generation is 'finished', the level will be generated again
 
+    //main method to generate the map
 	void Start () {
 		while (spawnFailed) {
 			try{
@@ -40,8 +41,10 @@ public class LevelGenerator : MonoBehaviour {
                 GroupRooms ();
 				SpawnCoridoorsWithinGroups();
 				SpawnCoridoorsBetweenGroups();
-                BuildRooms();
-                BuildNavMesh();
+                if (!spawnFailed) {
+                    BuildRooms();
+                    BuildNavMesh();
+                }
             } catch {
 				spawnFailed = true;
 			}
@@ -140,7 +143,7 @@ public class LevelGenerator : MonoBehaviour {
 			}
 		}
 
-        int smallestSize = 100;
+        int smallestSize = maxRoomSize * maxRoomSize;
         int biggestSize = 0;
         RoomController smallestRoom = rooms[0].getController();
         RoomController biggestRoom = smallestRoom;
@@ -213,7 +216,8 @@ public class LevelGenerator : MonoBehaviour {
     //spawns coridoors for every situation
 	private bool SpawnCoridoor(Room roomA, Room roomB, bool repeat, bool green){
 		Vector3 roomAEdge, roomBEdge;
-		float width, height;
+        float width = 0;
+        float height = 0;
 		bool success = true;
 		if (roomA.getXCentre() == roomB.getXCentre()) {
 			if (roomA.getZCentre() > roomB.getZCentre()) {
@@ -325,6 +329,10 @@ public class LevelGenerator : MonoBehaviour {
 			} else
 				success = false;
 		} 
+        //stops corridoors spawning through rooms
+        if (width >= minRoomSize * 1.5 || height > minRoomSize * 1.5) {
+            success = false;
+        }
 		return success;
 	}
 

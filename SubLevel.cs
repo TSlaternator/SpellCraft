@@ -80,8 +80,8 @@ public class SubLevel{
 			child2.CreateRoom ();
 		}
 		if (IsLeaf ()) {
-			roomWidth = (int)Random.Range (minRoomSize - 2, width - 2);
-			roomHeight = (int)Random.Range (minRoomSize - 2, height - 2);
+			roomWidth = (int)Random.Range (minRoomSize - 2, width - 4);
+			roomHeight = (int)Random.Range (minRoomSize - 2, height - 4);
             if (roomWidth % 2 != 0) roomWidth -= 1;
             if (roomHeight % 2 != 0) roomHeight -= 1;
 			room = new Room ((int)xCentre, (int)zCentre, roomWidth, roomHeight, depth);
