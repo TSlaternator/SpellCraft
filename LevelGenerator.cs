@@ -342,7 +342,8 @@ public class LevelGenerator : MonoBehaviour {
         CoridoorController controller = newCoridoor.GetComponent<CoridoorController>();
         controller.setVariables(width, height, isHorizontal);
         controller.SpawnCoridoor();
-        controller.setRooms(roomA, roomB);
+        //spawn will fail if doors can't spawn properly
+        if (!controller.setRooms(roomA, roomB)) spawnFailed = true;
     }
 
     //checks to see if a point from one room would be inside another room

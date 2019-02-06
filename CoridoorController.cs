@@ -31,24 +31,26 @@ public class CoridoorController : MonoBehaviour {
     }
 
     //lets the attached rooms know where the door is (so they know to leave room for it!)
-    public void setRooms(Room room1, Room room2) {
+    public bool setRooms(Room room1, Room room2) {
+        bool success = true;
         if (isHorizontal) {
             if (room1.getXCentre() > room2.getXCentre()) {
-                room1.getController().setDoor(1, (int)zCentre);
-                room2.getController().setDoor(3, (int)zCentre);
+                if (room1.getController().setDoor(1, (int)zCentre)) success = false;
+                if (room2.getController().setDoor(3, (int)zCentre)) success = false;
             } else {
-                room1.getController().setDoor(3, (int)zCentre);
-                room2.getController().setDoor(1, (int)zCentre);
+                if (room1.getController().setDoor(3, (int)zCentre)) success = false;
+                if (room2.getController().setDoor(1, (int)zCentre)) success = false;
             }
         } else {
             if (room1.getZCentre() > room2.getZCentre()) {
-                room1.getController().setDoor(2, (int)xCentre);
-                room2.getController().setDoor(0, (int)xCentre);
+                if (room1.getController().setDoor(2, (int)xCentre)) success = false;
+                if (room2.getController().setDoor(0, (int)xCentre)) success = false;
             } else {
-                room1.getController().setDoor(0, (int)xCentre);
-                room2.getController().setDoor(2, (int)xCentre);
+                if (room1.getController().setDoor(0, (int)xCentre)) success = false;
+                if (room2.getController().setDoor(2, (int)xCentre)) success = false;
             }
         }
+        return success;
     }
 
     public void SpawnWalls() {

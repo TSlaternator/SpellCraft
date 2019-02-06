@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Tilemaps;
 
 public class RoomController : MonoBehaviour
 {
@@ -46,6 +47,7 @@ public class RoomController : MonoBehaviour
         //Generating floors and walls
         SpawnWalls(roomTypeController.getWalls());
         tileGenerator.DrawRoom(xCentre, zCentre, width, height, roomTypeController.getTiles());
+        tileGenerator.DrawFog(xCentre, zCentre, width, height);
         roomTypeController.SpawnRoom(xCentre, zCentre, width, height);
     }
 
@@ -108,9 +110,14 @@ public class RoomController : MonoBehaviour
     }
 
     //lets the room know where a door will be
-    public void setDoor(int index, int position) {
-        doors[index] = true;
-        doorCentres[index] = position;
+    public bool setDoor(int index, int position) {
+        bool overwrite = false;
+        if (doors[index]) overwrite = true;
+        else {
+            doors[index] = true;
+            doorCentres[index] = position;
+        }
+        return overwrite;
     }
 
     //spawns the walls of the room, leaving gaps for any doors
