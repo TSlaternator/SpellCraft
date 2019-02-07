@@ -49,4 +49,19 @@ public class BossRoomController : MonoBehaviour, IRoomTypeController {
     public Tile[] getTiles() {
         return generator.bossRoom.floorTiles;
     }
+
+    //Returns the chance of wall decorations spawning
+    public float getWallDecorationFrequency() {
+        return generator.bossRoom.wallDecorationFrequency;
+    }
+
+    //Returns the wall decorations for this room
+    public GameObject[] getWallDecorations() {
+        return generator.bossRoom.wallDecorations;
+    }
+
+    //Returns the chances of each wall decoration spawning
+    public float[] getWallDecorationChances() {
+        return generator.bossRoom.wallDecorationChances;
+    }
 }

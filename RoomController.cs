@@ -7,6 +7,7 @@ public class RoomController : MonoBehaviour
 {
     [SerializeField] private GameObject floorPlane; //not visible in game, used to spawn a navmesh
     [SerializeField] private GameObject cornerWall; //walls at the corners of the room
+    [SerializeField] private GameObject decoration; //AAKWDUBIABDPAIWUBFAWDYVOAWBDIABSDKAJSFBKALSJFBLIWDUBAILWBDUALSKJDBASLKJB
     private bool[] doors; //which directions have doors (0 = N, 1 = E,  2 = S, 3 = W)
     private int[] doorCentres; //position of the door on direction corresponding to doors[]
     private float xCentre, zCentre; //centre point of the room
@@ -133,6 +134,7 @@ public class RoomController : MonoBehaviour
             thisWall.transform.localScale = new Vector3(thisWall.transform.localScale.x * width, thisWall.transform.localScale.y, thisWall.transform.localScale.z);
             thisWall.GetComponentsInChildren<Renderer>()[0].material.mainTextureScale = new Vector2(width, 1);
             thisWall.GetComponentsInChildren<Renderer>()[1].material.mainTextureScale = new Vector2(width, 1);
+            SpawnDecorations((int)(xCentre - 0.5f - (width / 2f)), (int)(zCentre + (height / 2f) - 1), width);
         } else {
             if (doorCentres[0] - (xCentre - width / 2) > 1) {
                 firstCorner = xCentre - width / 2;
@@ -142,6 +144,7 @@ public class RoomController : MonoBehaviour
                 thisWall.transform.localScale = new Vector3(thisWall.transform.localScale.x * wallSize, thisWall.transform.localScale.y, thisWall.transform.localScale.z);
                 thisWall.GetComponentsInChildren<Renderer>()[0].material.mainTextureScale = new Vector2(wallSize, 1);
                 thisWall.GetComponentsInChildren<Renderer>()[1].material.mainTextureScale = new Vector2(wallSize, 1);
+                SpawnDecorations((int)(firstCorner - 0.5f), (int)(zCentre + (height / 2f) - 1), (int)wallSize);
             }
             if ((xCentre + width / 2) - doorCentres[0] > 1) {
                 secondCorner = xCentre + width / 2;
@@ -151,6 +154,7 @@ public class RoomController : MonoBehaviour
                 thisWall.transform.localScale = new Vector3(thisWall.transform.localScale.x * wallSize, thisWall.transform.localScale.y, thisWall.transform.localScale.z);
                 thisWall.GetComponentsInChildren<Renderer>()[0].material.mainTextureScale = new Vector2(wallSize, 1);
                 thisWall.GetComponentsInChildren<Renderer>()[1].material.mainTextureScale = new Vector2(wallSize, 1);
+                SpawnDecorations((int)(secondCorner - 0.5f - wallSize), (int)(zCentre + (height / 2f) - 1), (int)wallSize);
             }
         }
         //east wall
@@ -245,5 +249,22 @@ public class RoomController : MonoBehaviour
         Instantiate(cornerWall, spawnPos, Quaternion.identity, gameObject.transform);
         spawnPos = new Vector3(xCentre + width / 2, 1, zCentre - 1f - height / 2);
         Instantiate(cornerWall, spawnPos, Quaternion.identity, gameObject.transform);
+    }
+
+    //Spawns decorations on the walls
+    private void SpawnDecorations(int xLeft, int zPos, int width) {
+        for (int i = 1; i <= width; i += 2) {
+            if (Random.Range(0f, 1f) < roomTypeController.getWallDecorationFrequency()) {
+                float decorationToSpawn = Random.Range(0f, 1f);
+                float[] chances = roomTypeController.getWallDecorationChances();
+                GameObject[] decorations = roomTypeController.getWallDecorations();
+                for (int j = 0; j < decorations.Length; j++) {
+                    if (decorationToSpawn <= chances[j]) {
+                        Instantiate(decorations[j], new Vector3(xLeft + i, 1f, zPos), Quaternion.identity, transform);
+                        j = decorations.Length;
+                    }
+                }
+            }
+        }
     }
 }

@@ -50,4 +50,19 @@ public class LootRoomController : MonoBehaviour, IRoomTypeController {
     public Tile[] getTiles() {
         return generator.lootRoom.floorTiles;
     }
+
+    //Returns the chance of wall decorations spawning
+    public float getWallDecorationFrequency() {
+        return generator.lootRoom.wallDecorationFrequency;
+    }
+
+    //Returns the wall decorations for this room
+    public GameObject[] getWallDecorations() {
+        return generator.lootRoom.wallDecorations;
+    }
+
+    //Returns the chances of each wall decoration spawning
+    public float[] getWallDecorationChances() {
+        return generator.lootRoom.wallDecorationChances;
+    }
 }

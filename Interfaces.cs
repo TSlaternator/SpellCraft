@@ -37,5 +37,14 @@ public interface IRoomTypeController {
 
     //Returns the floor used in the room
     Tile[] getTiles();
+
+    //Returns the chance of wall decorations spawning
+    float getWallDecorationFrequency();
+
+    //Returns the wall decorations for this room
+    GameObject[] getWallDecorations();
+
+    //Returns the chances of each wall decoration spawning
+    float[] getWallDecorationChances();
 }
 
