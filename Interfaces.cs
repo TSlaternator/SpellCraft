@@ -46,5 +46,23 @@ public interface IRoomTypeController {
 
     //Returns the chances of each wall decoration spawning
     float[] getWallDecorationChances();
+
+    //returns the chances of spawning a carpet
+    float getCarpetChance();
+
+    //gets the number of possible carpets for the room
+    int getCarpetCount();
+
+    //gets the tiles for a specific carpet
+    Tile[] getCarpetTiles(int carpetID);
+
+    //returns the chances of spawning a border
+    float getBorderChance();
+
+    //gets the number of possible borders for the room
+    int getBorderCount();
+
+    //gets the tile for a specific border
+    Tile[] getBorderTiles(int borderID);
 }
 

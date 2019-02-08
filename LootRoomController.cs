@@ -10,6 +10,8 @@ public class LootRoomController : MonoBehaviour, IRoomTypeController {
     private bool explored = false; //will turn true once the room has been entered
     private float xCentre, zCentre; //center of the room
     private int width, height; //dimensions of the room
+    private float carpetChance = 0f; //chances of spawning a carpet
+    private float borderChance = 0.6f; //chances of spawning a border
 
     //called when the room is first spawned
     public void SpawnRoom(float xCentre, float zCentre, int width, int height) {
@@ -64,5 +66,35 @@ public class LootRoomController : MonoBehaviour, IRoomTypeController {
     //Returns the chances of each wall decoration spawning
     public float[] getWallDecorationChances() {
         return generator.lootRoom.wallDecorationChances;
+    }
+
+    //returns the chances of spawning a carpet
+    public float getCarpetChance() {
+        return carpetChance;
+    }
+
+    //gets the number of possible carpets for the room
+    public int getCarpetCount() {
+        return -1;
+    }
+
+    //gets the tiles for a specific carpet
+    public Tile[] getCarpetTiles(int carpetID) {
+        return null;
+    }
+
+    //returns the chances of spawning a border
+    public float getBorderChance() {
+        return borderChance;
+    }
+
+    //gets the number of possible borders for the room
+    public int getBorderCount() {
+        return generator.lootRoom.borders.Length;
+    }
+
+    //gets the tile for a specific border
+    public Tile[] getBorderTiles(int borderID) {
+        return generator.lootRoom.borders[borderID].tiles;
     }
 }

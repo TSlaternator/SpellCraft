@@ -6,8 +6,6 @@ using UnityEngine.Tilemaps;
 public class RoomController : MonoBehaviour
 {
     [SerializeField] private GameObject floorPlane; //not visible in game, used to spawn a navmesh
-    [SerializeField] private GameObject cornerWall; //walls at the corners of the room
-    [SerializeField] private GameObject decoration; //AAKWDUBIABDPAIWUBFAWDYVOAWBDIABSDKAJSFBKALSJFBLIWDUBAILWBDUALSKJDBASLKJB
     private bool[] doors; //which directions have doors (0 = N, 1 = E,  2 = S, 3 = W)
     private int[] doorCentres; //position of the door on direction corresponding to doors[]
     private float xCentre, zCentre; //centre point of the room
@@ -50,6 +48,7 @@ public class RoomController : MonoBehaviour
         tileGenerator.DrawRoom(xCentre, zCentre, width, height, roomTypeController.getTiles());
         tileGenerator.DrawFog(xCentre, zCentre, width, height);
         roomTypeController.SpawnRoom(xCentre, zCentre, width, height);
+        SpawnTileDecorations();
     }
 
     //allows the room to do something when the player enters
@@ -242,13 +241,13 @@ public class RoomController : MonoBehaviour
         }
         //corners
         spawnPos = new Vector3(xCentre + width / 2, 1, zCentre + height / 2);
-        Instantiate(cornerWall, spawnPos, Quaternion.identity, gameObject.transform);
+        Instantiate(walls[3], spawnPos, Quaternion.identity, gameObject.transform);
         spawnPos = new Vector3(xCentre - 1f - width / 2, 1, zCentre + height / 2);
-        Instantiate(cornerWall, spawnPos, Quaternion.identity, gameObject.transform);
+        Instantiate(walls[3], spawnPos, Quaternion.identity * Quaternion.Euler(0f, 270f, 0f), gameObject.transform);
         spawnPos = new Vector3(xCentre - 1f - width / 2, 1, zCentre - 1f - height / 2);
-        Instantiate(cornerWall, spawnPos, Quaternion.identity, gameObject.transform);
+        Instantiate(walls[3], spawnPos, Quaternion.identity * Quaternion.Euler(0f, 180f, 0f), gameObject.transform);
         spawnPos = new Vector3(xCentre + width / 2, 1, zCentre - 1f - height / 2);
-        Instantiate(cornerWall, spawnPos, Quaternion.identity, gameObject.transform);
+        Instantiate(walls[3], spawnPos, Quaternion.identity * Quaternion.Euler(0f, 90f, 0f), gameObject.transform);
     }
 
     //Spawns decorations on the walls
@@ -265,6 +264,19 @@ public class RoomController : MonoBehaviour
                     }
                 }
             }
+        }
+    }
+
+    //Spawns decorated tiles on the floor
+    private void SpawnTileDecorations() {
+        float decorationChance = Random.Range(0f, 1f);
+        int decorationChoice;
+        if (decorationChance < roomTypeController.getCarpetChance()) {
+            decorationChoice = Random.Range(0, roomTypeController.getCarpetCount());
+            tileGenerator.DrawCarpet(xCentre, zCentre, width, height, roomTypeController.getCarpetTiles(decorationChoice));
+        } else if (decorationChance < roomTypeController.getBorderChance()) {
+            decorationChoice = Random.Range(0, roomTypeController.getBorderCount());
+            tileGenerator.DrawBorder(xCentre, zCentre, width, height, roomTypeController.getBorderTiles(decorationChoice));
         }
     }
 }

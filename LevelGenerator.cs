@@ -23,7 +23,8 @@ public class LevelGenerator : MonoBehaviour {
     public ShrineRoom shrineRoom; //struct to hold shrine room properties
     public LootRoom lootRoom; //struct to hold loot room properties
     public MobRoom mobRoom; //struct to hold mob room properties
-	private bool spawnFailed = true; //if true when generation is 'finished', the level will be generated again
+
+    private bool spawnFailed = true; //if true when generation is 'finished', the level will be generated again
 
     //main method to generate the map
 	void Start () {
@@ -419,6 +420,11 @@ public class LevelGenerator : MonoBehaviour {
 	}
 }
 
+
+/* ------------------------------
+ *     TODO: REFACTOR STRUCTS
+ * ----------------------------- */
+
 [System.Serializable]
 public struct GenericRoom {
     public GameObject[] walls; //walls used in the room
@@ -426,6 +432,8 @@ public struct GenericRoom {
     public float wallDecorationFrequency; //likelyhood of a wall decoration spawning
     public GameObject[] wallDecorations; //wall decorations of the room
     public float[] wallDecorationChances; //chance of each wall decoration spawning
+    public TileDecoration[] carpets; //selection of carpets approved for the room
+    public TileDecoration[] borders; //selection of borders approved for the room
 }
 
 [System.Serializable]
@@ -435,6 +443,7 @@ public struct BossRoom {
     public float wallDecorationFrequency; //likelyhood of a wall decoration spawning
     public GameObject[] wallDecorations; //wall decorations of the room
     public float[] wallDecorationChances; //chance of each wall decoration spawning
+    public TileDecoration[] borders; //selection of borders approved for the room
 }
 
 [System.Serializable]
@@ -445,6 +454,8 @@ public struct ShopRoom {
     public float wallDecorationFrequency; //likelyhood of a wall decoration spawning
     public GameObject[] wallDecorations; //wall decorations of the room
     public float[] wallDecorationChances; //chance of each wall decoration spawning
+    public TileDecoration[] carpets; //selection of carpets approved for the room
+    public TileDecoration[] borders; //selection of borders approved for the room
 }
 
 [System.Serializable]
@@ -455,6 +466,8 @@ public struct LibraryRoom {
     public float wallDecorationFrequency; //likelyhood of a wall decoration spawning
     public GameObject[] wallDecorations; //wall decorations of the room
     public float[] wallDecorationChances; //chance of each wall decoration spawning
+    public TileDecoration[] carpets; //selection of carpets approved for the room
+    public TileDecoration[] borders; //selection of borders approved for the room
 }
 
 [System.Serializable]
@@ -465,6 +478,7 @@ public struct ShrineRoom {
     public float wallDecorationFrequency; //likelyhood of a wall decoration spawning
     public GameObject[] wallDecorations; //wall decorations of the room
     public float[] wallDecorationChances; //chance of each wall decoration spawning
+    public TileDecoration[] borders; //selection of borders approved for the room
 }
 [System.Serializable]
 public struct LootRoom {
@@ -474,6 +488,7 @@ public struct LootRoom {
     public float wallDecorationFrequency; //likelyhood of a wall decoration spawning
     public GameObject[] wallDecorations; //wall decorations of the room
     public float[] wallDecorationChances; //chance of each wall decoration spawning
+    public TileDecoration[] borders; //selection of borders approved for the room
 }
 
 [System.Serializable]
@@ -483,4 +498,10 @@ public struct MobRoom {
     public float wallDecorationFrequency; //likelyhood of a wall decoration spawning
     public GameObject[] wallDecorations; //wall decorations of the room
     public float[] wallDecorationChances; //chance of each wall decoration spawning
+    public TileDecoration[] borders; //selection of borders approved for the room
+}
+
+[System.Serializable]
+public struct TileDecoration { //could be a carpet / border
+    public Tile[] tiles; //tiles used in the decoration
 }
