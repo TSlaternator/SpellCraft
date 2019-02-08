@@ -16,6 +16,9 @@ public class RoomController : MonoBehaviour
     private TileMapController tileGenerator; //allows spawning of floor tiles
     private IRoomTypeController roomTypeController; //allows different room types to have different designs
     private BoxCollider roomBounds; //allows detection of the player entering or leaving the room
+    private coordinates[] nodes; //nodes that can spawn an obstacle (table, pillar etc)
+
+    public GameObject OBSTACLE; //REMOADWOIADHOIAWBDIAWBDHOAIWDHOIAWOAd
 
     //spawns the physical room
     public void SpawnRoom() {
@@ -43,12 +46,17 @@ public class RoomController : MonoBehaviour
             case 6: roomTypeController = gameObject.AddComponent<LootRoomController>(); break;
             case 7: roomTypeController = gameObject.AddComponent<GenericRoomController>(); break;
         }
+
         //Generating floors and walls
         SpawnWalls(roomTypeController.getWalls());
         tileGenerator.DrawRoom(xCentre, zCentre, width, height, roomTypeController.getTiles());
-        tileGenerator.DrawFog(xCentre, zCentre, width, height);
+        //tileGenerator.DrawFog(xCentre, zCentre, width, height);
         roomTypeController.SpawnRoom(xCentre, zCentre, width, height);
         SpawnTileDecorations();
+
+        //Generating obstacles (pillars, tables etc)
+        CreateNodes();
+        SpawnObstacles();
     }
 
     //allows the room to do something when the player enters
@@ -279,4 +287,53 @@ public class RoomController : MonoBehaviour
             tileGenerator.DrawBorder(xCentre, zCentre, width, height, roomTypeController.getBorderTiles(decorationChoice));
         }
     }
+
+    //Creates the grid of nodes for obstacles
+    private void CreateNodes() {
+        //setting up variables
+        int nodeSize = 6;
+        int rows = (height - 2) / nodeSize;
+        int columns = (width - 2) / nodeSize;
+        nodes = new coordinates[rows * columns];
+        int xMultiplier, zMultiplier;
+        bool evenX = (columns % 2 == 0) ? true : false;
+        bool evenZ = (rows % 2 == 0) ? true : false;
+
+        //generating node coordinates
+        for (int  i = 0; i < columns; i++) {
+            //getting xMultiplier
+            if (evenX && i >= columns / 2) xMultiplier = i - (columns / 2) + 1;
+            else xMultiplier = i - (columns / 2);
+            for (int j = 0; j < rows; j++) {
+                //getting zMultiplier
+                if (evenZ && j >= rows / 2) zMultiplier = j - (rows / 2) + 1;
+                else zMultiplier = j - (rows / 2);
+
+                //setting up coordinates
+                if (evenX) { 
+                    if (i >= columns / 2) nodes[i * rows + j].x = xCentre + xMultiplier * nodeSize - 0.5f - (nodeSize / 2f);
+                    else nodes[i * rows + j].x = xCentre + xMultiplier * nodeSize - 0.5f + (nodeSize / 2f);
+                } else nodes[i * rows + j].x = xCentre + xMultiplier * nodeSize - 0.5f;
+
+                if (evenZ) {
+                    if (j >= rows / 2) nodes[i * rows + j].z = zCentre + zMultiplier * nodeSize - 0.5f - (nodeSize / 2f);
+                    else nodes[i * rows + j].z = zCentre + zMultiplier * nodeSize - 0.5f + (nodeSize / 2f);
+                } else nodes[i * rows + j].z = zCentre + zMultiplier * nodeSize - 0.5f;
+            }
+        }
+    }
+
+    //Procedurally spawns obstacles at the node positions
+    private void SpawnObstacles() {
+        for (int i = 0; i < nodes.Length; i++) {
+            if (nodes[i].x != xCentre - 0.5f || nodes[i].z != zCentre - 0.5f)
+                Instantiate(OBSTACLE, new Vector3(nodes[i].x, 0f, nodes[i].z), Quaternion.identity, transform);
+        }
+    }
+}
+
+[System.Serializable]
+public struct coordinates {
+    public float x; //x position of the coordinate
+    public float z; //z position of the coordinate
 }
