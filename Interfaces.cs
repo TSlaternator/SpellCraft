@@ -64,5 +64,17 @@ public interface IRoomTypeController {
 
     //gets the tile for a specific border
     Tile[] getBorderTiles(int borderID);
+
+    //gets the chance to spawn a pillar at applicable points
+    float getPillarChance();
+
+    //gets the chance to spawn an obstruction at applicable points
+    float getObstructionChance();
+
+    //gets the chances of the rooms obstructions spawning
+    float[] getObstructionChances();
+
+    //gets all obstructions associated with the room
+    GameObject[] getObstructions();
 }
 

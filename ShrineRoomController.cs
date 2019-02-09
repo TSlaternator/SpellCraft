@@ -12,6 +12,8 @@ public class ShrineRoomController : MonoBehaviour, IRoomTypeController {
     private int width, height; //dimensions of the room
     private float carpetChance = 0f; //chances of spawning a carpet
     private float borderChance = 0.7f; //chances of spawning a border
+    private float pillarChance = 0f; //chances of spawning a pillar at applicable points
+    private float obstructionChance = 0.3f; //chances of spawning an obstruction at applicable points
 
     //called when the room is first spawned
     public void SpawnRoom(float xCentre, float zCentre, int width, int height) {
@@ -98,4 +100,23 @@ public class ShrineRoomController : MonoBehaviour, IRoomTypeController {
         return generator.shrineRoom.borders[borderID].tiles;
     }
 
+    //gets the chance to spawn a pillar at applicable points
+    public float getPillarChance() {
+        return pillarChance;
+    }
+
+    //gets the chance to spawn an obstruction at applicable points
+    public float getObstructionChance() {
+        return obstructionChance;
+    }
+
+    //gets the chances of the rooms obstructions spawning
+    public float[] getObstructionChances() {
+        return generator.shrineRoom.obstructionChances;
+    }
+
+    //gets all obstructions associated with the room
+    public GameObject[] getObstructions() {
+        return generator.shrineRoom.obstructions;
+    }
 }

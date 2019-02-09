@@ -434,6 +434,8 @@ public struct GenericRoom {
     public float[] wallDecorationChances; //chance of each wall decoration spawning
     public TileDecoration[] carpets; //selection of carpets approved for the room
     public TileDecoration[] borders; //selection of borders approved for the room
+    public GameObject[] obstructions; //selection of obstructions that can spawn in the room
+    public float[] obstructionChances; //chances of each obstruction spawning
 }
 
 [System.Serializable]
@@ -444,6 +446,8 @@ public struct BossRoom {
     public GameObject[] wallDecorations; //wall decorations of the room
     public float[] wallDecorationChances; //chance of each wall decoration spawning
     public TileDecoration[] borders; //selection of borders approved for the room
+    public GameObject[] obstructions; //selection of obstructions that can spawn in the room
+    public float[] obstructionChances; //chances of each obstruction spawning
 }
 
 [System.Serializable]
@@ -456,6 +460,8 @@ public struct ShopRoom {
     public float[] wallDecorationChances; //chance of each wall decoration spawning
     public TileDecoration[] carpets; //selection of carpets approved for the room
     public TileDecoration[] borders; //selection of borders approved for the room
+    public GameObject[] obstructions; //selection of obstructions that can spawn in the room
+    public float[] obstructionChances; //chances of each obstruction spawning
 }
 
 [System.Serializable]
@@ -468,6 +474,8 @@ public struct LibraryRoom {
     public float[] wallDecorationChances; //chance of each wall decoration spawning
     public TileDecoration[] carpets; //selection of carpets approved for the room
     public TileDecoration[] borders; //selection of borders approved for the room
+    public GameObject[] obstructions; //selection of obstructions that can spawn in the room
+    public float[] obstructionChances; //chances of each obstruction spawning
 }
 
 [System.Serializable]
@@ -479,6 +487,8 @@ public struct ShrineRoom {
     public GameObject[] wallDecorations; //wall decorations of the room
     public float[] wallDecorationChances; //chance of each wall decoration spawning
     public TileDecoration[] borders; //selection of borders approved for the room
+    public GameObject[] obstructions; //selection of obstructions that can spawn in the room
+    public float[] obstructionChances; //chances of each obstruction spawning
 }
 [System.Serializable]
 public struct LootRoom {
@@ -489,6 +499,8 @@ public struct LootRoom {
     public GameObject[] wallDecorations; //wall decorations of the room
     public float[] wallDecorationChances; //chance of each wall decoration spawning
     public TileDecoration[] borders; //selection of borders approved for the room
+    public GameObject[] obstructions; //selection of obstructions that can spawn in the room
+    public float[] obstructionChances; //chances of each obstruction spawning
 }
 
 [System.Serializable]
@@ -499,6 +511,8 @@ public struct MobRoom {
     public GameObject[] wallDecorations; //wall decorations of the room
     public float[] wallDecorationChances; //chance of each wall decoration spawning
     public TileDecoration[] borders; //selection of borders approved for the room
+    public GameObject[] obstructions; //selection of obstructions that can spawn in the room
+    public float[] obstructionChances; //chances of each obstruction spawning
 }
 
 [System.Serializable]
