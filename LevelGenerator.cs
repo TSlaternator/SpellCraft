@@ -436,6 +436,9 @@ public struct GenericRoom {
     public TileDecoration[] borders; //selection of borders approved for the room
     public GameObject[] obstructions; //selection of obstructions that can spawn in the room
     public float[] obstructionChances; //chances of each obstruction spawning
+    public float breakableFrequency; //likelyhood of a breakable object spawning
+    public GameObject[] breakables; //breakable objects of the room
+    public float[] breakablesChances; //chances of each breakable spawning
 }
 
 [System.Serializable]
@@ -448,6 +451,9 @@ public struct BossRoom {
     public TileDecoration[] borders; //selection of borders approved for the room
     public GameObject[] obstructions; //selection of obstructions that can spawn in the room
     public float[] obstructionChances; //chances of each obstruction spawning
+    public float breakableFrequency; //likelyhood of a breakable object spawning
+    public GameObject[] breakables; //breakable objects of the room
+    public float[] breakablesChances; //chances of each breakable spawning
 }
 
 [System.Serializable]
@@ -462,6 +468,9 @@ public struct ShopRoom {
     public TileDecoration[] borders; //selection of borders approved for the room
     public GameObject[] obstructions; //selection of obstructions that can spawn in the room
     public float[] obstructionChances; //chances of each obstruction spawning
+    public float breakableFrequency; //likelyhood of a breakable object spawning
+    public GameObject[] breakables; //breakable objects of the room
+    public float[] breakablesChances; //chances of each breakable spawning
 }
 
 [System.Serializable]
@@ -476,6 +485,9 @@ public struct LibraryRoom {
     public TileDecoration[] borders; //selection of borders approved for the room
     public GameObject[] obstructions; //selection of obstructions that can spawn in the room
     public float[] obstructionChances; //chances of each obstruction spawning
+    public float breakableFrequency; //likelyhood of a breakable object spawning
+    public GameObject[] breakables; //breakable objects of the room
+    public float[] breakablesChances; //chances of each breakable spawning
 }
 
 [System.Serializable]
@@ -489,6 +501,9 @@ public struct ShrineRoom {
     public TileDecoration[] borders; //selection of borders approved for the room
     public GameObject[] obstructions; //selection of obstructions that can spawn in the room
     public float[] obstructionChances; //chances of each obstruction spawning
+    public float breakableFrequency; //likelyhood of a breakable object spawning
+    public GameObject[] breakables; //breakable objects of the room
+    public float[] breakablesChances; //chances of each breakable spawning
 }
 [System.Serializable]
 public struct LootRoom {
@@ -499,8 +514,12 @@ public struct LootRoom {
     public GameObject[] wallDecorations; //wall decorations of the room
     public float[] wallDecorationChances; //chance of each wall decoration spawning
     public TileDecoration[] borders; //selection of borders approved for the room
+    public TileDecoration[] carpets; //selection of carpets approved for the room
     public GameObject[] obstructions; //selection of obstructions that can spawn in the room
     public float[] obstructionChances; //chances of each obstruction spawning
+    public float breakableFrequency; //likelyhood of a breakable object spawning
+    public GameObject[] breakables; //breakable objects of the room
+    public float[] breakablesChances; //chances of each breakable spawning
 }
 
 [System.Serializable]
@@ -513,6 +532,9 @@ public struct MobRoom {
     public TileDecoration[] borders; //selection of borders approved for the room
     public GameObject[] obstructions; //selection of obstructions that can spawn in the room
     public float[] obstructionChances; //chances of each obstruction spawning
+    public float breakableFrequency; //likelyhood of a breakable object spawning
+    public GameObject[] breakables; //breakable objects of the room
+    public float[] breakablesChances; //chances of each breakable spawning
 }
 
 [System.Serializable]

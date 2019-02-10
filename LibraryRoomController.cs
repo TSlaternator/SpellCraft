@@ -13,7 +13,7 @@ public class LibraryRoomController : MonoBehaviour, IRoomTypeController {
     private float carpetChance = 0.4f; //chances of spawning a carpet
     private float borderChance = 0.8f; //chances of spawning a border
     private float pillarChance = 0.5f; //chances of spawning a pillar at applicable points
-    private float obstructionChance = 0.7f; //chances of spawning an obstruction at applicable points
+    private float obstructionChance = 0.8f; //chances of spawning an obstruction at applicable points
 
     //called when the room is first spawned
     public void SpawnRoom(float xCentre, float zCentre, int width, int height) {
@@ -118,5 +118,20 @@ public class LibraryRoomController : MonoBehaviour, IRoomTypeController {
     //gets all obstructions associated with the room
     public GameObject[] getObstructions() {
         return generator.libraryRoom.obstructions;
+    }
+
+    //Returns the chance of breakable objects (barrels, crates) spawning
+    public float getBreakablesFrequency() {
+        return generator.libraryRoom.breakableFrequency;
+    }
+
+    //Returns the breakable objects for this room type
+    public GameObject[] getBreakables() {
+        return generator.libraryRoom.breakables;
+    }
+
+    //Returns the chances of each breakable object spawning
+    public float[] getBreakablesChances() {
+        return generator.libraryRoom.breakablesChances;
     }
 }

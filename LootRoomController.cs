@@ -10,10 +10,10 @@ public class LootRoomController : MonoBehaviour, IRoomTypeController {
     private bool explored = false; //will turn true once the room has been entered
     private float xCentre, zCentre; //center of the room
     private int width, height; //dimensions of the room
-    private float carpetChance = 0f; //chances of spawning a carpet
-    private float borderChance = 0.6f; //chances of spawning a border
+    private float carpetChance = 0.2f; //chances of spawning a carpet
+    private float borderChance = 0.8f; //chances of spawning a border
     private float pillarChance = 0.3f; //chances of spawning a pillar at applicable points
-    private float obstructionChance = 0.5f; //chances of spawning an obstruction at applicable points
+    private float obstructionChance = 0.7f; //chances of spawning an obstruction at applicable points
 
     //called when the room is first spawned
     public void SpawnRoom(float xCentre, float zCentre, int width, int height) {
@@ -77,12 +77,12 @@ public class LootRoomController : MonoBehaviour, IRoomTypeController {
 
     //gets the number of possible carpets for the room
     public int getCarpetCount() {
-        return -1;
+        return generator.lootRoom.carpets.Length;
     }
 
     //gets the tiles for a specific carpet
     public Tile[] getCarpetTiles(int carpetID) {
-        return null;
+        return generator.lootRoom.carpets[carpetID].tiles;
     }
 
     //returns the chances of spawning a border
@@ -118,5 +118,20 @@ public class LootRoomController : MonoBehaviour, IRoomTypeController {
     //gets all obstructions associated with the room
     public GameObject[] getObstructions() {
         return generator.lootRoom.obstructions;
+    }
+
+    //Returns the chance of breakable objects (barrels, crates) spawning
+    public float getBreakablesFrequency() {
+        return generator.lootRoom.breakableFrequency;
+    }
+
+    //Returns the breakable objects for this room type
+    public GameObject[] getBreakables() {
+        return generator.lootRoom.breakables;
+    }
+
+    //Returns the chances of each breakable object spawning
+    public float[] getBreakablesChances() {
+        return generator.lootRoom.breakablesChances;
     }
 }

@@ -21,7 +21,7 @@ public class ShrineRoomController : MonoBehaviour, IRoomTypeController {
         this.zCentre = zCentre;
         this.width = width;
         this.height = height;
-        Instantiate(generator.shrineRoom.shrine, new Vector3(xCentre - 0.5f, 1f, zCentre - 0.5f), Quaternion.identity, transform);
+        Instantiate(generator.shrineRoom.shrine, new Vector3(xCentre - 0.5f, 0f, zCentre - 0.5f), Quaternion.identity, transform);
     }
 
     //controls what happens when the player enters the room
@@ -118,5 +118,20 @@ public class ShrineRoomController : MonoBehaviour, IRoomTypeController {
     //gets all obstructions associated with the room
     public GameObject[] getObstructions() {
         return generator.shrineRoom.obstructions;
+    }
+
+    //Returns the chance of breakable objects (barrels, crates) spawning
+    public float getBreakablesFrequency() {
+        return generator.shrineRoom.breakableFrequency;
+    }
+
+    //Returns the breakable objects for this room type
+    public GameObject[] getBreakables() {
+        return generator.shrineRoom.breakables;
+    }
+
+    //Returns the chances of each breakable object spawning
+    public float[] getBreakablesChances() {
+        return generator.shrineRoom.breakablesChances;
     }
 }

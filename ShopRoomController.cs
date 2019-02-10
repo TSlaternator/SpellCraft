@@ -13,7 +13,7 @@ public class ShopRoomController : MonoBehaviour, IRoomTypeController {
     private float carpetChance = 0.6f; //chances of spawning a carpet
     private float borderChance = 0.8f; //chances of spawning a border
     private float pillarChance = 0f; //chances of spawning a pillar at applicable points
-    private float obstructionChance = 0.7f; //chances of spawning an obstruction at applicable points
+    private float obstructionChance = 0.95f; //chances of spawning an obstruction at applicable points
 
     //called when the room is first spawned
     public void SpawnRoom(float xCentre, float zCentre, int width, int height) {
@@ -118,5 +118,20 @@ public class ShopRoomController : MonoBehaviour, IRoomTypeController {
     //gets all obstructions associated with the room
     public GameObject[] getObstructions() {
         return generator.shopRoom.obstructions;
+    }
+
+    //Returns the chance of breakable objects (barrels, crates) spawning
+    public float getBreakablesFrequency() {
+        return generator.shopRoom.breakableFrequency;
+    }
+
+    //Returns the breakable objects for this room type
+    public GameObject[] getBreakables() {
+        return generator.shopRoom.breakables;
+    }
+
+    //Returns the chances of each breakable object spawning
+    public float[] getBreakablesChances() {
+        return generator.shopRoom.breakablesChances;
     }
 }

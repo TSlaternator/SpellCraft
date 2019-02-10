@@ -118,4 +118,19 @@ public class SpawnRoomController : MonoBehaviour, IRoomTypeController{
     public GameObject[] getObstructions() {
         return generator.genericRoom.obstructions;
     }
+
+    //Returns the chance of breakable objects (barrels, crates) spawning
+    public float getBreakablesFrequency() {
+        return generator.genericRoom.breakableFrequency;
+    }
+
+    //Returns the breakable objects for this room type
+    public GameObject[] getBreakables() {
+        return generator.genericRoom.breakables;
+    }
+
+    //Returns the chances of each breakable object spawning
+    public float[] getBreakablesChances() {
+        return generator.genericRoom.breakablesChances;
+    }
 }

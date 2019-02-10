@@ -76,5 +76,14 @@ public interface IRoomTypeController {
 
     //gets all obstructions associated with the room
     GameObject[] getObstructions();
+
+    //Returns the chance of breakable objects (barrels, crates) spawning
+    float getBreakablesFrequency();
+
+    //Returns the breakable objects for this room type
+    GameObject[] getBreakables();
+
+    //Returns the chances of each breakable object spawning
+    float[] getBreakablesChances();
 }
 
