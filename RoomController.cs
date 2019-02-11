@@ -18,8 +18,6 @@ public class RoomController : MonoBehaviour
     private BoxCollider roomBounds; //allows detection of the player entering or leaving the room
     private coordinates[] nodes; //nodes that can spawn an obstacle (table, pillar etc)
 
-    public GameObject OBSTACLE; //REMOADWOIADHOIAWBDIAWBDHOAIWDHOIAWOAd
-
     //spawns the physical room
     public void SpawnRoom() {
 
@@ -34,7 +32,6 @@ public class RoomController : MonoBehaviour
         //sets up the roomTypeController
         switch (roomType) {
             case 0: roomTypeController = gameObject.AddComponent<SpawnRoomController>();
-                Debug.Log("Spawn Room");
                 GameObject.Find("Player").transform.position = new Vector3(xCentre, transform.position.y, zCentre);
                 GameObject.Find("CameraPosition").transform.position = new Vector3(xCentre, 10f, zCentre - 10f);
                 break;
@@ -50,7 +47,7 @@ public class RoomController : MonoBehaviour
         //Generating floors and walls
         SpawnWalls(roomTypeController.getWalls());
         tileGenerator.DrawRoom(xCentre, zCentre, width, height, roomTypeController.getTiles());
-        tileGenerator.DrawFog(xCentre, zCentre, width, height);
+        tileGenerator.DrawFog(xCentre, zCentre, width, height); //Darkening rooms until they're explored
         roomTypeController.SpawnRoom(xCentre, zCentre, width, height);
         SpawnTileDecorations();
 
@@ -143,7 +140,7 @@ public class RoomController : MonoBehaviour
             thisWall.GetComponentsInChildren<Renderer>()[0].material.mainTextureScale = new Vector2(width, 1);
             thisWall.GetComponentsInChildren<Renderer>()[1].material.mainTextureScale = new Vector2(width, 1);
             SpawnDecorations((int)(xCentre - 0.5f - (width / 2f)), (int)(zCentre + (height / 2f) - 1), width);
-            SpawnBreakables((int)(xCentre - (width / 2)), (int)(zCentre + (height / 2) - 1), width, true);
+            SpawnBreakables((int)(xCentre - (width / 2)), (int)(zCentre + (height / 2) - 1), width - 2, true);
         } else {
             if (doorCentres[0] - (xCentre - width / 2) > 1) {
                 firstCorner = xCentre - width / 2;
@@ -165,7 +162,7 @@ public class RoomController : MonoBehaviour
                 thisWall.GetComponentsInChildren<Renderer>()[0].material.mainTextureScale = new Vector2(wallSize, 1);
                 thisWall.GetComponentsInChildren<Renderer>()[1].material.mainTextureScale = new Vector2(wallSize, 1);
                 SpawnDecorations((int)(secondCorner - 0.5f - wallSize), (int)(zCentre + (height / 2f) - 1), (int)wallSize);
-                SpawnBreakables((int)(secondCorner - wallSize), (int)(zCentre + (height / 2) - 1), (int)wallSize, true);
+                SpawnBreakables((int)(secondCorner - wallSize - 1), (int)(zCentre + (height / 2) - 1), (int)wallSize - 1, true);
             }
         }
         //east wall
@@ -174,7 +171,7 @@ public class RoomController : MonoBehaviour
             thisWall = Instantiate(walls[1], spawnPos, Quaternion.identity * Quaternion.Euler(0, -90, 0), gameObject.transform);
             thisWall.transform.localScale = new Vector3(thisWall.transform.localScale.x * height, thisWall.transform.localScale.y, thisWall.transform.localScale.z);
             thisWall.GetComponentInChildren<Renderer>().material.mainTextureScale = new Vector2(height, 1);
-            SpawnBreakables((int)(xCentre + (width / 2) - 1), (int)(zCentre - (height / 2)), height, false);
+            SpawnBreakables(xCentre - (width / 2), zCentre - (height / 2) + 1, height - 3, false);
         } else {
             if (doorCentres[1] - (zCentre - height / 2) > 1) {
                 firstCorner = zCentre - height / 2;
@@ -183,7 +180,7 @@ public class RoomController : MonoBehaviour
                 thisWall = Instantiate(walls[1], spawnPos, Quaternion.identity * Quaternion.Euler(0, -90, 0), gameObject.transform);
                 thisWall.transform.localScale = new Vector3(thisWall.transform.localScale.x * wallSize, thisWall.transform.localScale.y, thisWall.transform.localScale.z);
                 thisWall.GetComponentInChildren<Renderer>().material.mainTextureScale = new Vector2(wallSize, 1);
-                SpawnBreakables((int)(xCentre + (width / 2) - 1), (int)(firstCorner), (int)wallSize - 3, false);
+                SpawnBreakables(xCentre - (width / 2), firstCorner + 1, (int)wallSize - 1, false);
             }
             if ((zCentre + height / 2) - doorCentres[1] > 1) {
                 secondCorner = zCentre + height / 2;
@@ -192,7 +189,7 @@ public class RoomController : MonoBehaviour
                 thisWall = Instantiate(walls[1], spawnPos, Quaternion.identity * Quaternion.Euler(0, -90, 0), gameObject.transform);
                 thisWall.transform.localScale = new Vector3(thisWall.transform.localScale.x * wallSize, thisWall.transform.localScale.y, thisWall.transform.localScale.z);
                 thisWall.GetComponentInChildren<Renderer>().material.mainTextureScale = new Vector2(wallSize, 1);
-                SpawnBreakables((int)(xCentre + (width / 2) - 1), (int)(secondCorner - wallSize), (int)wallSize - 1, false);
+                SpawnBreakables(xCentre - (width / 2), secondCorner - wallSize, (int)wallSize - 2, false);
             }
         }
         //west wall
@@ -201,7 +198,7 @@ public class RoomController : MonoBehaviour
             thisWall = Instantiate(walls[1], spawnPos, Quaternion.identity * Quaternion.Euler(0, 90, 0), gameObject.transform);
             thisWall.transform.localScale = new Vector3(thisWall.transform.localScale.x * height, thisWall.transform.localScale.y, thisWall.transform.localScale.z);
             thisWall.GetComponentInChildren<Renderer>().material.mainTextureScale = new Vector2(height, 1);
-            SpawnBreakables((int)(xCentre - (width / 2)), (int)(zCentre - (height / 2)), height, false);
+            SpawnBreakables((int)(xCentre + (width / 2) - 1), (int)(zCentre - (height / 2) + 1), height - 3, false);
         } else {
             if (doorCentres[3] - (zCentre - height / 2) > 1) {
                 firstCorner = zCentre - height / 2;
@@ -210,7 +207,7 @@ public class RoomController : MonoBehaviour
                 thisWall = Instantiate(walls[1], spawnPos, Quaternion.identity * Quaternion.Euler(0, 90, 0), gameObject.transform);
                 thisWall.transform.localScale = new Vector3(thisWall.transform.localScale.x * wallSize, thisWall.transform.localScale.y, thisWall.transform.localScale.z);
                 thisWall.GetComponentInChildren<Renderer>().material.mainTextureScale = new Vector2(wallSize, 1);
-                SpawnBreakables((int)(xCentre - (width / 2)), (int)(firstCorner), (int)wallSize, false);
+                SpawnBreakables((int)(xCentre + (width / 2) - 1), (int)(firstCorner + 1), (int)wallSize - 1, false);
             }
             if ((zCentre + height / 2) - doorCentres[3] > 1) {
                 secondCorner = zCentre + height / 2;
@@ -219,7 +216,7 @@ public class RoomController : MonoBehaviour
                 thisWall = Instantiate(walls[1], spawnPos, Quaternion.identity * Quaternion.Euler(0, 90, 0), gameObject.transform);
                 thisWall.transform.localScale = new Vector3(thisWall.transform.localScale.x * wallSize, thisWall.transform.localScale.y, thisWall.transform.localScale.z);
                 thisWall.GetComponentInChildren<Renderer>().material.mainTextureScale = new Vector2(wallSize, 1);
-                SpawnBreakables((int)(xCentre - (width / 2)), (int)(secondCorner - wallSize), (int)wallSize - 1, false);
+                SpawnBreakables((int)(xCentre + (width / 2) - 1), (int)(secondCorner - wallSize), (int)wallSize - 2, false);
             }
         }
         //south wall
@@ -231,7 +228,7 @@ public class RoomController : MonoBehaviour
             thisWall.GetComponentsInChildren<Renderer>()[1].material.mainTextureScale = new Vector2(width, 1);
             wallTexture = thisWall.GetComponentsInChildren<Transform>()[1];
             wallTexture.localScale = new Vector3((thisWall.transform.localScale.x * (width + 2)) / (thisWall.transform.localScale.x * (width)) / 10, 1f, 0.1f);
-            SpawnBreakables((int)(xCentre - (width / 2)), (int)(zCentre - (height / 2) + 1), width, true);
+            SpawnBreakables((int)(xCentre - (width / 2)), (int)(zCentre - (height / 2) + 1), width - 2, true);
         } else {
             if (doorCentres[2] - (xCentre - width / 2) > 1) {
                 firstCorner = xCentre - width / 2;
@@ -257,7 +254,7 @@ public class RoomController : MonoBehaviour
                 wallTexture = thisWall.GetComponentsInChildren<Transform>()[1];
                 wallTexture.localScale = new Vector3((thisWall.transform.localScale.x * (wallSize + 1)) / (thisWall.transform.localScale.x * (wallSize)) / 10, 1f, 0.1f);
                 wallTexture.position = new Vector3(wallTexture.position.x + 0.5f, wallTexture.position.y, wallTexture.position.z);
-                SpawnBreakables((int)(secondCorner - wallSize), (int)(zCentre - (height / 2) + 1), (int)wallSize, true);
+                SpawnBreakables((int)(secondCorner - wallSize - 1), (int)(zCentre - (height / 2) + 1), (int)wallSize - 1, true);
             }
         }
         //corners
@@ -400,10 +397,10 @@ public class RoomController : MonoBehaviour
         Instantiate(walls[4], new Vector3(xPos - 1, 1, zPos + 0.5f), Quaternion.identity * Quaternion.Euler(0, 90f, 0), transform); //top left section
         Instantiate(walls[4], new Vector3(xPos + 1, 1, zPos + 0.5f), Quaternion.identity * Quaternion.Euler(0, 180f, 0), transform); //top right section
         Instantiate(walls[4], new Vector3(xPos + 1, 1, zPos - 0.5f), Quaternion.identity * Quaternion.Euler(0, 270f, 0), transform); //bottom right section
-        //Spawning breakables around the pillar
-        SpawnBreakables(xPos - 2, zPos - 1.5f, 3, true);
-        SpawnBreakables(xPos - 2, zPos - 1.5f, 2, false);
-        SpawnBreakables(xPos + 2, zPos - 1.5f, 2, false);
+        //Spawning breakables around the pillar (Currently decided not to use this, may change in future)
+       // SpawnBreakables(xPos - 2, zPos - 1.5f, 3, true);
+       // SpawnBreakables(xPos - 2, zPos - 1.5f, 2, false);
+       // SpawnBreakables(xPos + 2, zPos - 1.5f, 2, false);
     }
 }
 

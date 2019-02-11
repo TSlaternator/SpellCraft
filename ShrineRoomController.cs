@@ -21,7 +21,7 @@ public class ShrineRoomController : MonoBehaviour, IRoomTypeController {
         this.zCentre = zCentre;
         this.width = width;
         this.height = height;
-        Instantiate(generator.shrineRoom.shrine, new Vector3(xCentre - 0.5f, 0f, zCentre - 0.5f), Quaternion.identity, transform);
+        Instantiate(generator.shrineRoom.interactable, new Vector3(xCentre - 0.5f, 0f, zCentre - 0.5f), Quaternion.identity, transform);
     }
 
     //controls what happens when the player enters the room

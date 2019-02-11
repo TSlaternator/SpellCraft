@@ -58,32 +58,30 @@ public class DoorController : MonoBehaviour {
 
 	//rotates the door sprites open
 	private void RotateOpen(int direction, GameObject door){
-        door.transform.Rotate (0, 0, 90 * direction);
-        if (doorFacing == 0) door.transform.Translate(0f, -0.3f, 0.5f);
-        else door.transform.Translate(0f, -0.3f, -0.5f);
+        door.transform.Rotate (0, 90 * direction, 0);
+        door.transform.Translate(0f, -0.3f, -0.5f);
+        if (doorFacing == 0) door.transform.Translate(0f, 0.8f, 0f);
     }
 
     //rotates sideways facing doors open
     private void RotateOpenSide(int direction, GameObject door) {
         door.transform.GetChild(0).gameObject.SetActive(false);
-        door.transform.Rotate(0, 0, 90 * direction);
-        if (doorFacing == 0) door.transform.Translate(0f, -0.3f, 0.5f);
-        else door.transform.Translate(-0.5f * direction, 0f, -0.5f);
+        door.transform.Rotate(0, 90 * -direction, 0);
+        door.transform.Translate(-0.5f * direction, 0f, -0.4f);
     }
 
     //rotates the door sprites closed
     private void RotateClosed(int direction, GameObject door) {
-        if (doorFacing == 0) door.transform.Translate(0f, 0.3f, -0.5f);
-        else door.transform.Translate(0f, 0.3f, 0.5f);
-        door.transform.Rotate(0, 0, 90 * direction);
+        if (doorFacing == 0) door.transform.Translate(0f, -0.8f, 0f);
+        door.transform.Translate(0f, 0.3f, 0.5f);
+        door.transform.Rotate(0, 90 * direction, 0);
     }
 
     //rotates side doors closed
     private void RotateClosedSide(int direction, GameObject door) {
         door.transform.GetChild(0).gameObject.SetActive(true);
-        if (doorFacing == 0) door.transform.Translate(0f, 0.3f, -0.5f);
-        else door.transform.Translate(-0.5f * direction, 0f, 0.5f);
-        door.transform.Rotate(0, 0, 90 * direction);
+        door.transform.Translate(-0.5f * direction, 0f, 0.4f);
+        door.transform.Rotate(0, 90 * -direction, 0);
     }
 
     //sets the door facing

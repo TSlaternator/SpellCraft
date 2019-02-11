@@ -16,40 +16,41 @@ public class LevelGenerator : MonoBehaviour {
     [SerializeField] private GameObject room; //empty gameObject with script to control room creation
     [SerializeField] private TileMapController tileController; //controls the tileMap, used to refresh all tiles on a failed generation
     [SerializeField] private NavMeshSurface[] navmeshes; //nav mesh surfaces, should be baked after the rooms have spawned
-    public GenericRoom genericRoom; //struct to hold generic room properties
-    public BossRoom bossRoom; //struct to hold boss room properties
-    public LibraryRoom libraryRoom; //struct to hold library room properties
-    public ShopRoom shopRoom; //struct to hold shoproom properties
-    public ShrineRoom shrineRoom; //struct to hold shrine room properties
-    public LootRoom lootRoom; //struct to hold loot room properties
-    public MobRoom mobRoom; //struct to hold mob room properties
+
+    public RoomType genericRoom; //struct to hold generic room properties
+    public RoomType bossRoom; //struct to hold boss room properties
+    public RoomType libraryRoom; //struct to hold library room properties
+    public RoomType shopRoom; //struct to hold shop room properties
+    public RoomType shrineRoom; //struct to hold shrine room properties
+    public RoomType lootRoom; //struct to hold lootroom properties
+    public RoomType mobRoom; //struct to hold mobroom properties
 
     private bool spawnFailed = true; //if true when generation is 'finished', the level will be generated again
 
     //main method to generate the map
 	void Start () {
-		while (spawnFailed) {
+		while (spawnFailed) { //while loop used until a generation meets all criteria (main one being that every room is actually connected!)
 			try{
-				spawnFailed = false;
+				spawnFailed = false; //will be set to true in fatal circumstances (no direct line between rooms, coridoors unable to generate etc)
 				SubLevel rootLevel = new SubLevel (levelWidth / 2f, levelHeight / 2f, levelWidth, levelHeight, minRoomSize, true, 0);
-                SplitLevel(rootLevel);
-				rootLevel.CreateRoom ();
-				rootLevel.FindPairs ();
+                SplitLevel(rootLevel); //recursive method to split the map into appropriately sized sections
+				rootLevel.CreateRoom (); //recursive method to create rooms in the sections
+				rootLevel.FindPairs (); //recursive method to find pairs of rooms
 				rooms = new List<Room> ();
 				groups = new List<RoomGroup> ();
-				GetRooms (rootLevel);
-				SpawnRooms ();
-                GroupRooms ();
-				SpawnCoridoorsWithinGroups();
-				SpawnCoridoorsBetweenGroups();
+				GetRooms (rootLevel); //returns all rooms
+				SpawnRooms (); //spawns in rooms (including generating stats)
+                GroupRooms (); //groups rooms together
+				SpawnCoridoorsWithinGroups(); //spawns coridoors within each group
+				SpawnCoridoorsBetweenGroups(); //connects each group with a coridoor
                 if (!spawnFailed) {
-                    BuildRooms();
-                    BuildNavMesh();
+                    BuildRooms(); //builds the physical aspect of the rooms
+                    BuildNavMesh(); //builds a navmesh, used for AI movement
                 }
             } catch {
 				spawnFailed = true;
 			}
-			if (spawnFailed) {
+			if (spawnFailed) { //Resetting, before trying again
 				for (int i = 0; i < roomList.childCount; i++) {
 					Destroy (roomList.GetChild (i).gameObject);
 				}
@@ -422,113 +423,18 @@ public class LevelGenerator : MonoBehaviour {
 
 
 /* ------------------------------
- *     TODO: REFACTOR STRUCTS
+ *     Structs for Proc Gen
  * ----------------------------- */
 
 [System.Serializable]
-public struct GenericRoom {
+public struct RoomType { //holds aesthetic elements unique to each room type (library, shop, boss etc)
     public GameObject[] walls; //walls used in the room
+    public GameObject interactable; //interactable object used in some rooms (shops, shrines, chests etc)
     public Tile[] floorTiles; //floor tiles of the room
     public float wallDecorationFrequency; //likelyhood of a wall decoration spawning
     public GameObject[] wallDecorations; //wall decorations of the room
     public float[] wallDecorationChances; //chance of each wall decoration spawning
     public TileDecoration[] carpets; //selection of carpets approved for the room
-    public TileDecoration[] borders; //selection of borders approved for the room
-    public GameObject[] obstructions; //selection of obstructions that can spawn in the room
-    public float[] obstructionChances; //chances of each obstruction spawning
-    public float breakableFrequency; //likelyhood of a breakable object spawning
-    public GameObject[] breakables; //breakable objects of the room
-    public float[] breakablesChances; //chances of each breakable spawning
-}
-
-[System.Serializable]
-public struct BossRoom {
-    public GameObject[] walls; //walls used in the room
-    public Tile[] floorTiles; //floor tiles of the room
-    public float wallDecorationFrequency; //likelyhood of a wall decoration spawning
-    public GameObject[] wallDecorations; //wall decorations of the room
-    public float[] wallDecorationChances; //chance of each wall decoration spawning
-    public TileDecoration[] borders; //selection of borders approved for the room
-    public GameObject[] obstructions; //selection of obstructions that can spawn in the room
-    public float[] obstructionChances; //chances of each obstruction spawning
-    public float breakableFrequency; //likelyhood of a breakable object spawning
-    public GameObject[] breakables; //breakable objects of the room
-    public float[] breakablesChances; //chances of each breakable spawning
-}
-
-[System.Serializable]
-public struct ShopRoom {
-    public GameObject[] walls; //walls used in the room
-    public Tile[] floorTiles; //floor tiles of the room
-    public GameObject shop; //shop sprites
-    public float wallDecorationFrequency; //likelyhood of a wall decoration spawning
-    public GameObject[] wallDecorations; //wall decorations of the room
-    public float[] wallDecorationChances; //chance of each wall decoration spawning
-    public TileDecoration[] carpets; //selection of carpets approved for the room
-    public TileDecoration[] borders; //selection of borders approved for the room
-    public GameObject[] obstructions; //selection of obstructions that can spawn in the room
-    public float[] obstructionChances; //chances of each obstruction spawning
-    public float breakableFrequency; //likelyhood of a breakable object spawning
-    public GameObject[] breakables; //breakable objects of the room
-    public float[] breakablesChances; //chances of each breakable spawning
-}
-
-[System.Serializable]
-public struct LibraryRoom {
-    public GameObject[] walls; //walls used in the room
-    public Tile[] floorTiles; //floor tiles of the room
-    public GameObject scribingTable; //scribing table sprite
-    public float wallDecorationFrequency; //likelyhood of a wall decoration spawning
-    public GameObject[] wallDecorations; //wall decorations of the room
-    public float[] wallDecorationChances; //chance of each wall decoration spawning
-    public TileDecoration[] carpets; //selection of carpets approved for the room
-    public TileDecoration[] borders; //selection of borders approved for the room
-    public GameObject[] obstructions; //selection of obstructions that can spawn in the room
-    public float[] obstructionChances; //chances of each obstruction spawning
-    public float breakableFrequency; //likelyhood of a breakable object spawning
-    public GameObject[] breakables; //breakable objects of the room
-    public float[] breakablesChances; //chances of each breakable spawning
-}
-
-[System.Serializable]
-public struct ShrineRoom {
-    public GameObject[] walls; //walls used in the room
-    public Tile[] floorTiles; //floor tiles of the room
-    public GameObject shrine; //shrine game object
-    public float wallDecorationFrequency; //likelyhood of a wall decoration spawning
-    public GameObject[] wallDecorations; //wall decorations of the room
-    public float[] wallDecorationChances; //chance of each wall decoration spawning
-    public TileDecoration[] borders; //selection of borders approved for the room
-    public GameObject[] obstructions; //selection of obstructions that can spawn in the room
-    public float[] obstructionChances; //chances of each obstruction spawning
-    public float breakableFrequency; //likelyhood of a breakable object spawning
-    public GameObject[] breakables; //breakable objects of the room
-    public float[] breakablesChances; //chances of each breakable spawning
-}
-[System.Serializable]
-public struct LootRoom {
-    public GameObject[] walls; //walls used in the room
-    public Tile[] floorTiles; //floor tiles of the room
-    public GameObject chest; //chest to hold loot
-    public float wallDecorationFrequency; //likelyhood of a wall decoration spawning
-    public GameObject[] wallDecorations; //wall decorations of the room
-    public float[] wallDecorationChances; //chance of each wall decoration spawning
-    public TileDecoration[] borders; //selection of borders approved for the room
-    public TileDecoration[] carpets; //selection of carpets approved for the room
-    public GameObject[] obstructions; //selection of obstructions that can spawn in the room
-    public float[] obstructionChances; //chances of each obstruction spawning
-    public float breakableFrequency; //likelyhood of a breakable object spawning
-    public GameObject[] breakables; //breakable objects of the room
-    public float[] breakablesChances; //chances of each breakable spawning
-}
-
-[System.Serializable]
-public struct MobRoom {
-    public GameObject[] walls; //walls used in the room
-    public Tile[] floorTiles; //floor tiles of the room
-    public float wallDecorationFrequency; //likelyhood of a wall decoration spawning
-    public GameObject[] wallDecorations; //wall decorations of the room
-    public float[] wallDecorationChances; //chance of each wall decoration spawning
     public TileDecoration[] borders; //selection of borders approved for the room
     public GameObject[] obstructions; //selection of obstructions that can spawn in the room
     public float[] obstructionChances; //chances of each obstruction spawning
