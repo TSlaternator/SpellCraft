@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Tilemaps;
+using UnityEngine.AI;
 
 public class RoomController : MonoBehaviour
 {
@@ -58,12 +59,12 @@ public class RoomController : MonoBehaviour
 
     //allows the room to do something when the player enters
     void OnTriggerEnter(Collider other) {
-        if (other.tag == "Player") roomTypeController.OnPlayerEnter();
+        if (other.tag == "Player" && other.isTrigger) roomTypeController.OnPlayerEnter();
     }
 
     //allows the room to do something when the player exits
     void OnTriggerExit(Collider other) {
-        if (other.tag == "Player") roomTypeController.OnPlayerExit();
+        if (other.tag == "Player" && other.isTrigger) roomTypeController.OnPlayerExit();
     }
 
     //sets up the door variables
@@ -401,6 +402,46 @@ public class RoomController : MonoBehaviour
        // SpawnBreakables(xPos - 2, zPos - 1.5f, 3, true);
        // SpawnBreakables(xPos - 2, zPos - 1.5f, 2, false);
        // SpawnBreakables(xPos + 2, zPos - 1.5f, 2, false);
+    }
+
+    //Spawns mobs in the room based on its threat value, and available mobs
+    public void SpawnMobs(GameObject[] mobs, int[] mobThreatLevels, int roomThreatBonus) {
+        threat *= 100;
+        threat += roomThreatBonus;
+        int minThreatValue = getMin(mobThreatLevels);
+        while (threat >= minThreatValue) {
+            int mobToSpawn = Random.Range(0, mobThreatLevels.Length);
+            if (threat >= mobThreatLevels[mobToSpawn]) {
+                SpawnMob(mobs[mobToSpawn]);
+                threat -= mobThreatLevels[mobToSpawn];
+            }
+        } 
+    }
+
+    //Spawns the given mob somewhere random (but pathable) within the room
+    public void SpawnMob(GameObject mob) {
+        bool spawned = false; //will repeat until true!
+        float xPos, zPos; //positions to spawn at
+        Vector3 spawnPoint; //point to spawn the mob at
+        NavMeshHit hit; //navmesh hit data (used for debugging)
+        while (!spawned) {
+            xPos = Random.Range(xCentre - width / 2, xCentre + width / 2);
+            zPos = Random.Range(zCentre - height / 2, zCentre + height / 2);
+            spawnPoint = new Vector3 (xPos, 0f, zPos);
+            if (NavMesh.SamplePosition(spawnPoint, out hit, 0.1f, NavMesh.AllAreas)) {
+                Instantiate(mob, spawnPoint, Quaternion.identity);
+                spawned = true;
+            } 
+        }
+    }
+
+    //Gets the lowest value in the array
+    public int getMin(int[] values) {
+        int answer = 100;
+        for (int i = 0; i < values.Length; i++) {
+            if (values[i] < answer) answer = values[i];
+        }
+        return answer;
     }
 }
 

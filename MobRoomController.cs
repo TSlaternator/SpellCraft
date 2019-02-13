@@ -7,6 +7,7 @@ public class MobRoomController : MonoBehaviour, IRoomTypeController{
 
     private LevelGenerator generator; //the level generator script
     private TileMapController tileController; //the tile map controller script
+    private RoomController roomController; //room controller of the room
     private bool explored = false; //will turn true once the room has been entered
     private float xCentre, zCentre; //center of the room
     private int width, height; //dimensions of the room
@@ -14,6 +15,7 @@ public class MobRoomController : MonoBehaviour, IRoomTypeController{
     private float borderChance = 0.8f; //chances of spawning a border
     private float pillarChance = 0.3f; //chances of spawning a pillar at applicable points
     private float obstructionChance = 0.6f; //chances of spawning an obstruction at applicable points
+    private int extraThreatValue = 50; //extra threat value added when spawning mobs
 
     //called when the room is first spawned
     public void SpawnRoom(float xCentre, float zCentre, int width, int height) {
@@ -30,6 +32,8 @@ public class MobRoomController : MonoBehaviour, IRoomTypeController{
             explored = true;
             tileController = GameObject.Find("LevelManager").GetComponent<TileMapController>();
             tileController.RemoveFog(xCentre, zCentre, width, height);
+            roomController = gameObject.GetComponent<RoomController>();
+            roomController.SpawnMobs(generator.mobRoom.mobs, generator.mobRoom.mobThreatValues, extraThreatValue);
         }
     }
 

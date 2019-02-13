@@ -10,6 +10,7 @@ public class LevelGenerator : MonoBehaviour {
 	[SerializeField] private int minRoomSize, maxRoomSize; //max and min size a room can be
 	[SerializeField] private List<Room> rooms; //list of rooms in the level
 	[SerializeField] private List<RoomGroup> groups; //list of groups of rooms (used when joining up the level)
+    [SerializeField] private List<CoridoorController> coridoorControllers; //used to build coridoors at the end of the generation
 	[SerializeField] private Transform roomList; //rooms are spawned under this transform to reduce clutter in the GUI
 	[SerializeField] private Transform coridoorList; //coridoors are spawned under this transform to reduce clutter in the GUI
     [SerializeField] private GameObject coridoor; //empty gameObject with script to control coridoor creation
@@ -38,39 +39,39 @@ public class LevelGenerator : MonoBehaviour {
 				rootLevel.FindPairs (); //recursive method to find pairs of rooms
 				rooms = new List<Room> ();
 				groups = new List<RoomGroup> ();
+                coridoorControllers = new List<CoridoorController> ();
 				GetRooms (rootLevel); //returns all rooms
 				SpawnRooms (); //spawns in rooms (including generating stats)
                 GroupRooms (); //groups rooms together
 				SpawnCoridoorsWithinGroups(); //spawns coridoors within each group
 				SpawnCoridoorsBetweenGroups(); //connects each group with a coridoor
-                if (!spawnFailed) {
-                    BuildRooms(); //builds the physical aspect of the rooms
-                    BuildNavMesh(); //builds a navmesh, used for AI movement
-                }
             } catch {
 				spawnFailed = true;
 			}
 			if (spawnFailed) { //Resetting, before trying again
+                
 				for (int i = 0; i < roomList.childCount; i++) {
 					Destroy (roomList.GetChild (i).gameObject);
 				}
 				for (int i = 0; i < coridoorList.childCount; i++) {
 					Destroy (coridoorList.GetChild (i).gameObject);
 				}
-                while (roomList.childCount > 0) roomList.GetChild(0).parent = null;
+                while (roomList.childCount > 0) roomList.GetChild(0).parent = null; 
+                while (coridoorList.childCount > 0) coridoorList.GetChild(0).parent = null;
                 tileController.ResetTiles(levelWidth, levelHeight);
-                for (int i = 0; i < navmeshes.Length; i++) {
-                    navmeshes[i].RemoveData();
-                }
 			}
 		}
-	}
+
+        BuildCoridoors(); //builds the physical aspect of the coridoors;
+        BuildRooms(); //builds the physical aspect of the rooms
+        BuildNavMesh(); //builds a navmesh, used for AI movement
+    }
 
     //builds the navmesh after generating the level
     private void BuildNavMesh() {
-        for(int i = 0; i < navmeshes.Length; i++) {
+        for (int i = 0; i < navmeshes.Length; i++) {
             navmeshes[i].BuildNavMesh();
-        }
+        } 
     }
 
     //splits the SubLevel into smaller SubLevels until they're the correct size
@@ -87,6 +88,13 @@ public class LevelGenerator : MonoBehaviour {
     private void BuildRooms() {
         for (int i = 0; i < roomList.childCount; i++) {
             rooms[i].getController().SpawnRoom();
+        }
+    }
+
+    //loops through each coridoor, creating its physical walls and floor
+    private void BuildCoridoors() {
+        for(int i = 0; i < coridoorControllers.Count; i++) {
+            coridoorControllers[i].SpawnCoridoor();
         }
     }
 
@@ -343,7 +351,7 @@ public class LevelGenerator : MonoBehaviour {
         GameObject newCoridoor = Instantiate(coridoor, spawnPoint, Quaternion.identity, coridoorList);
         CoridoorController controller = newCoridoor.GetComponent<CoridoorController>();
         controller.setVariables(width, height, isHorizontal);
-        controller.SpawnCoridoor();
+        coridoorControllers.Add(controller);
         //spawn will fail if doors can't spawn properly
         if (!controller.setRooms(roomA, roomB)) spawnFailed = true;
     }
@@ -441,6 +449,8 @@ public struct RoomType { //holds aesthetic elements unique to each room type (li
     public float breakableFrequency; //likelyhood of a breakable object spawning
     public GameObject[] breakables; //breakable objects of the room
     public float[] breakablesChances; //chances of each breakable spawning
+    public GameObject[] mobs; //list of mobs that can spawn in the room
+    public int[] mobThreatValues; //threat values of those mobs
 }
 
 [System.Serializable]
