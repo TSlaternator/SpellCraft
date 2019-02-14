@@ -16,27 +16,8 @@ public class SpellController : MonoBehaviour {
 	[SerializeField] private GameObject[] projectileSpells; //array of the different spell bases
 	[SerializeField] private Transform projectileList; //list to tidy up the interface
 
-	private GameObject currentSpell; //the current spell being cast
-	private int currentBase; //the base of the current spell
-	private int currentForm; //the form of the current spell
-	private int[] currentKinetics = new int[3]; //the kinetics of the current spell
-	private int[] currentAugments = new int[3]; //the augments of the current spell
-	private int[] currentEffects = new int[3]; //the effects of the current spell
-	private float[] currentStats = new float[8]; //the stats of the current spell
-	private int consecutiveCasts; //how many times the current spell has been cast consecutively
-	private float cooldown; //the cooldown of the current spell
-	private float manaCost; //the mana cost of the current spell
-	private float baseAccuracy; //the accuracy of the current spell before modifiers
-	private float realAccuracy; //the accuracy of the current spell after modifiers
-
-	/* DO I EVEN WANT THIS STUFF???? */
-	private bool[] consecutiveStats = new bool[8];
-	private int[] consecutiveStatFactors = new int[8];
-	private float[] consecutiveLerpSmall = new float[11];
-	private float[] consecutiveLerpMedium = new float[11];
-	private float[] consecutiveLerpLarge = new float[11];
-	private float[] consecutiveLerpInverse = new float[11];
-	/* MAYBE TIERS OF AUGMENTS INSTEAD?? */
+    private Spell currentSpell; //current Spell the player will cast
+	private GameObject currentSpellObject; //the current spell being cast
 
 	private float nextCast; //next time a spell can be cast
 	private bool casting; //if the player is holding down the cast button
@@ -47,37 +28,14 @@ public class SpellController : MonoBehaviour {
 
 	//initialising variables
 	void Start(){
-		currentBase = 8;
-		currentForm = 0;
-
-		for (int i = 0; i < 3; i++) {
-			currentKinetics [i] = -1;
-			currentAugments [i] = -1;
-			currentEffects [i] = -1;
-		}
-
-		for (int i = 0; i < 11; i++) {
-			consecutiveLerpSmall [i] = Mathf.Lerp (1f, 1.35f, i / 10f);
-			consecutiveLerpMedium [i] = Mathf.Lerp (1f, 1.7f, i / 10f);
-			consecutiveLerpLarge [i] = Mathf.Lerp (1f, 2.4f, i / 10f);
-			consecutiveLerpInverse [i] = Mathf.Lerp (1f, 0.5f, i / 10f);
-		}
-
 		lastCast = Time.time;
 		nextCast = Time.time;
-		cooldown = 1f;
-		manaCost = 0f;
-		baseAccuracy = 5f;
-		realAccuracy = baseAccuracy;
 		currentSlot = 0;
 	}
 
 	//controls the players casting
 	void Update () {
 		if (!PauseMenu.isPaused) {
-			
-			if (Time.time - lastCast > 5f) consecutiveCasts = 0;
-
 
 			if (Input.GetButton ("KeyboardR")) {
 				if (!meditating) {
@@ -91,6 +49,7 @@ public class SpellController : MonoBehaviour {
 
 			if (!meditating) {
 
+                //Getting user input
 				if (Input.GetButtonDown ("KeyboardR")) {
 					meditating = true;
 					casting = false;
@@ -114,57 +73,27 @@ public class SpellController : MonoBehaviour {
 					NextSpell ();
 				}
 				
-				if (casting && Time.time >= nextCast && playerStats.GetMana () >= manaCost && currentBase != 8) {
+                //Casts a spell if the player is holding down the cast button, has enough mana, and their spell isnt on cooldown
+				if (casting && Time.time >= nextCast && playerStats.GetMana () >= currentSpell.manaCost && currentSpell.spellBase != 8) {
 
-					if (currentForm < 8) {
-						CastProjectile (GeneratePosition (1f, 0), GenerateSpread (1f), true, 1f, 0);
+                    //casts a spell of the correct spellForm
+					if (currentSpell.spellForm < 8) {
+						CastProjectile (GeneratePosition (1f, 0), GenerateSpread (1f), 1f, 0);
 						lastCast = Time.time;
-					} else if (currentForm < 16) {
+					} else if (currentSpell.spellForm < 16) {
 						CastBurst ();
 						lastCast = Time.time;
-					} else if (currentForm < 24) {
+					} else if (currentSpell.spellForm < 24) {
 						CastSpread ();
 						lastCast = Time.time;
-					} else if (currentForm < 32) {
+					} else if (currentSpell.spellForm < 32) {
 						CastPulse ();
 						lastCast = Time.time;
 					}
 
-					if (consecutiveStats [0]) { 
-						switch (consecutiveStatFactors [0]) {
-						case -2:
-							playerStats.DrainMana (manaCost * consecutiveLerpInverse [consecutiveCasts] * consecutiveLerpInverse [consecutiveCasts]);
-							break;
-						case -1:
-							playerStats.DrainMana (manaCost * consecutiveLerpInverse [consecutiveCasts]);
-							break;
-						case 1:
-							playerStats.DrainMana (manaCost * consecutiveLerpInverse [10 - consecutiveCasts]);
-							break;
-						case 2:
-							playerStats.DrainMana (manaCost * consecutiveLerpInverse [10 - consecutiveCasts] * consecutiveLerpInverse [10 - consecutiveCasts]);
-							break;
-						}
-					} else
-						playerStats.DrainMana (manaCost);
-
-					if (consecutiveStats [1]) {
-						switch (consecutiveStatFactors [1]) {
-						case -2:
-							nextCast = Time.time + cooldown * consecutiveLerpInverse [consecutiveCasts] * consecutiveLerpInverse [consecutiveCasts];
-							break;
-						case -1:
-							nextCast = Time.time + cooldown * consecutiveLerpInverse [consecutiveCasts];
-							break;
-						case 1:
-							nextCast = Time.time + cooldown * consecutiveLerpInverse [10 - consecutiveCasts];
-							break;
-						case 2:
-							nextCast = Time.time + cooldown * consecutiveLerpInverse [10 - consecutiveCasts] * consecutiveLerpInverse [10 - consecutiveCasts];
-							break;
-						}
-					} else
-						nextCast = Time.time + cooldown;
+                    //Drain mana and reset cooldown
+                    playerStats.DrainMana (currentSpell.manaCost);
+					nextCast = Time.time + currentSpell.cooldown;
 
 				} 
 			}
@@ -172,48 +101,30 @@ public class SpellController : MonoBehaviour {
 	}
 
 	//Overwrites the current spell (called when a spell is crafted in the menu)
-	public void Cast(int spellBase, int spellForm, int[] spellKinetics, int[] spellAugments, int[] spellEffects, float[] spellStats, Sprite spellIcon){
+	public void Cast(Spell spell){
+        currentSpell = spell;
+		spellSlots [currentSlot].setSpell (currentSpell);
 
-		spellSlots [currentSlot].SetSpell (spellBase, spellForm, spellKinetics, spellAugments, spellEffects, spellStats, spellIcon);
+        //TODO: FIND A BETTER WAY TO COPY THE ARRAY //
+        currentSpell.spellEffects = new int[3] { spell.spellEffects[0], spell.spellEffects[1], spell.spellEffects[2] };
+        currentSpell.spellAugments = new int[3] { spell.spellAugments[0], spell.spellAugments[1], spell.spellAugments[2]};
+        currentSpell.spellKinetics = new int[3] { spell.spellKinetics[0], spell.spellKinetics[1], spell.spellKinetics[2]};
 
-		currentBase = spellBase;
-		currentForm = spellForm;
-		manaCost = spellStats [0];
-		cooldown = spellStats [1];
-		baseAccuracy = spellStats [4];
-
-		for (int i = 0; i < 3; i++) {
-			currentKinetics[i] = spellKinetics[i];
-			currentAugments[i] = spellAugments[i];
-			currentEffects[i] = spellEffects[i];
-		}
-
-		for (int i = 0; i < 8; i++) {
-			currentStats [i] = spellStats [i];
-			consecutiveStats [i] = false;
-			consecutiveStatFactors [i] = 0;
-		}
-
-		if ((currentForm + 1) % 8 == 0) vengefulSpell = true;
-		else  vengefulSpell = false;
-
-		consecutiveCasts = 0;
+        if ((currentSpell.spellForm) % 8 == 7) vengefulSpell = true;
+		else vengefulSpell = false;
 	}
 
 	//Casts a single projectile
-	private void CastProjectile(Vector3 castPoint, Vector3 spread, bool consecutiveCast, float scale, int castPointID){
-		StartCoroutine (camera.CameraShake (transform.position - castPoints[castPointID].position, currentStats[0]/100f, 0.1f));
-		for (int i = 0; i < 8; i++) consecutiveStatFactors [i] = 0;
+	private void CastProjectile(Vector3 castPoint, Vector3 spread, float scale, int castPointID){
+		StartCoroutine (camera.CameraShake (transform.position - castPoints[castPointID].position, currentSpell.manaCost/100f, 0.1f));
 
-		currentSpell = projectileSpells [currentBase];
-		GameObject spell = Instantiate (currentSpell, castPoint, castPoints[castPointID].rotation, projectileList);
+        currentSpellObject = projectileSpells [currentSpell.spellBase];
+		GameObject spell = Instantiate (currentSpellObject, castPoint, castPoints[castPointID].rotation, projectileList);
 		spell.transform.localScale *= scale;
 
 		ApplySpellEffects (spell);
 		spell.transform.Rotate (spread);
-
-		if (consecutiveCast) ConsecutiveCast ();
-	}
+    }
 
 	//casts a three round burst
 	private void CastBurst(){
@@ -222,31 +133,29 @@ public class SpellController : MonoBehaviour {
 
 	//controls the burst delay
 	private IEnumerator BurstFire(){
-		CastProjectile (GeneratePosition (1f, 0), GenerateSpread (1f), false, 0.8f, 0);
+		CastProjectile (GeneratePosition (1f, 0), GenerateSpread (1f), 0.8f, 0);
 		yield return new WaitForSeconds (0.04f);
-		CastProjectile (GeneratePosition (1f, 0), GenerateSpread (1f), false, 0.8f, 0);
+		CastProjectile (GeneratePosition (1f, 0), GenerateSpread (1f), 0.8f, 0);
 		yield return new WaitForSeconds (0.04f);
-		CastProjectile (GeneratePosition (1f, 0), GenerateSpread (1f), true, 0.8f, 0);
+		CastProjectile (GeneratePosition (1f, 0), GenerateSpread (1f), 0.8f, 0);
 	}
 
-	//casts a sread of projectiles
+	//casts a spread of projectiles
 	private void CastSpread(){
-		for (int i = 0; i < 4; i++) CastProjectile (GeneratePosition(1f, 0), GenerateSpread(1f), false, 0.67f, 0);
-		CastProjectile (GeneratePosition(1f, 0), GenerateSpread(1f), true, 0.67f, 0);
+		for (int i = 0; i < 5; i++) CastProjectile (GeneratePosition(1f, 0), GenerateSpread(1f), 0.67f, 0);
 	} 
 
 	//casts a pulse of projectiles
 	private void CastPulse(){
 		for (int i = 0; i < 8; i++) {
-			if (i == 7) CastProjectile (GeneratePosition (1f, i), GenerateSpread (1f), true, 0.67f, i);
-			else CastProjectile (GeneratePosition (1f, i), GenerateSpread (1f), false, 0.67f, i);
+			CastProjectile (GeneratePosition (1f, i), GenerateSpread (1f), 0.67f, i);
 		}
 	}
 
 	//applies kinetic effects
 	private void ApplyKinetics(ProjectileController controller){
 		for (int i = 0; i < 3; i++) {
-			switch (currentKinetics [i]) {
+			switch (currentSpell.spellKinetics [i]) {
 			case -1: break;
 			case 0: controller.LatchingKinetic(); break;
 			case 1: controller.BlockingKinetic (); break;
@@ -260,217 +169,10 @@ public class SpellController : MonoBehaviour {
 		}
 	}
 
-	//applies spell augments (Refactor This)
-	private void ApplyAugments(ProjectileController controller, SpellEffectController effectController, GameObject spell){
-		for (int i = 0; i < 3; i++) {
-			switch (currentAugments [i]) {
-			case -1: break;
-			case 16: RepeatingPowerAugment (); break;
-			case 17: SporadicPowerAugment (); break;
-			case 18: RepeatingSpeedAugment (); break;
-			case 19: SporadicSpeedAugment (); break;
-			case 20: RepeatingAccuracyAugment (); break;
-			case 21: SporadicAccuracyAugment (); break;
-			case 22: RepeatingStaggerAugment (); break;
-			case 23: SporadicStaggerAugment (); break;
-			case 24: RepeatingCritChanceAugment (); break;
-			case 25: SporadicCritChanceAugment (); break;
-			case 26: RepeatingCritPowerAugment (); break;
-			case 27: SporadicCritPowerAugment (); break;
-			case 28: RepeatingManaCostAugment (); break;
-			case 29: SporadicManaCostAugment (); break;
-			case 30: RepeatingCooldownAugment (); break;
-			case 31: SporadicCooldownAugment (); break;
-			case 32: AttenuatingPowerAugment (effectController); break;
-			case 33: DampeningPowerAugment (effectController); break;
-			case 34: AttenuatingStaggerAugment (effectController); break;
-			case 35: DampeningStaggerAugment (effectController); break;
-			case 36: AttenuatingCritChanceAugment (effectController); break;
-			case 37: DampeningCritChanceAugment (effectController); break;
-			case 38: AttenuatingCritPowerAugment (effectController); break;
-			case 39: DampeningCritPowerAugment (effectController); break;
-			}
-		}
-		if (consecutiveStats [2]) ConsecutivePower (effectController);
-		if (consecutiveStats [3]) ConsecutiveSpeed (controller);
-		if (consecutiveStats [4]) ConsecutiveAccuracy ();
-		if (consecutiveStats [5]) ConsecutiveStagger (effectController);
-		if (consecutiveStats [6]) ConsecutiveCritChance (effectController);
-		if (consecutiveStats [7]) ConsecutiveCritPower (effectController);
-	}
-
-	private void RepeatingManaCostAugment(){
-		consecutiveStats[0] = true;
-		consecutiveStatFactors[0] -= 1;
-	}
-
-	private void SporadicManaCostAugment(){
-		consecutiveStats[0] = true;
-		consecutiveStatFactors[0] += 1;
-	}
-
-	private void RepeatingCooldownAugment(){
-		consecutiveStats[1] = true;
-		consecutiveStatFactors[1] -= 1;
-	}
-
-	private void SporadicCooldownAugment(){
-		consecutiveStats[1] = true;
-		consecutiveStatFactors[1] += 1;
-	}
-
-	private void RepeatingPowerAugment(){
-		consecutiveStats [2] = true;
-		consecutiveStatFactors [2] += 1;
-	}
-
-	private void SporadicPowerAugment(){
-		consecutiveStats [2] = true;
-		consecutiveStatFactors [2] -= 1;
-	}
-		
-	private void ConsecutivePower(SpellEffectController spell){
-		switch (consecutiveStatFactors [2]) {
-		case -2: spell.ModifyDamage(consecutiveLerpSmall[10 - consecutiveCasts] * consecutiveLerpSmall[10 - consecutiveCasts]); break;
-		case -1: spell.ModifyDamage(consecutiveLerpSmall[10 - consecutiveCasts]); break;
-		case 1: spell.ModifyDamage(consecutiveLerpSmall[consecutiveCasts]); break;
-		case 2: spell.ModifyDamage(consecutiveLerpSmall[consecutiveCasts] * consecutiveLerpSmall[consecutiveCasts]); break;
-		}
-	}
-		
-	private void RepeatingSpeedAugment(){
-		consecutiveStats [3] = true;
-		consecutiveStatFactors [3] += 1;
-	}
-
-	private void SporadicSpeedAugment(){
-		consecutiveStats [3] = true;
-		consecutiveStatFactors [3] -= 1;
-	}
-
-	private void ConsecutiveSpeed(ProjectileController controller){
-		switch (consecutiveStatFactors [3]) {
-		case -2: controller.ModifySpeed(consecutiveLerpMedium[10 - consecutiveCasts] * consecutiveLerpSmall[10 - consecutiveCasts]); break;
-		case -1: controller.ModifySpeed(consecutiveLerpMedium[10 - consecutiveCasts]); break;
-		case 1: controller.ModifySpeed(consecutiveLerpMedium[consecutiveCasts]); break;
-		case 2: controller.ModifySpeed(consecutiveLerpMedium[consecutiveCasts] * consecutiveLerpSmall[consecutiveCasts]); break;
-		}
-	}
-
-	private void RepeatingAccuracyAugment(){
-		consecutiveStats[4] = true;
-		consecutiveStatFactors[4] += 1;
-	}
-
-	private void SporadicAccuracyAugment(){
-		consecutiveStats[4] = true;
-		consecutiveStatFactors[4] -= 1;
-	}
-
-	private void ConsecutiveAccuracy(){
-		realAccuracy = baseAccuracy;
-
-		switch (consecutiveStatFactors [4]) {
-		case -2: realAccuracy -= 2 * consecutiveLerpLarge [10 - consecutiveCasts]; break;
-		case -1: realAccuracy -= consecutiveLerpLarge [10 - consecutiveCasts]; break;
-		case 1: realAccuracy -= consecutiveLerpLarge [consecutiveCasts]; break;
-		case 2: realAccuracy -= 2 * consecutiveLerpLarge [consecutiveCasts]; break;
-		}
-	}
-
-	private void RepeatingStaggerAugment(){
-		consecutiveStats [5] = true;
-		consecutiveStatFactors [5] += 1;
-	}
-
-	private void SporadicStaggerAugment(){
-		consecutiveStats [5] = true;
-		consecutiveStatFactors [5] -= 1;
-	}
-
-	private void ConsecutiveStagger(SpellEffectController spell){
-		switch (consecutiveStatFactors [5]) {
-		case -2: spell.ModifyStagger(consecutiveLerpLarge[10 - consecutiveCasts] * consecutiveLerpSmall[10 - consecutiveCasts]); break;
-		case -1: spell.ModifyStagger(consecutiveLerpLarge[10 - consecutiveCasts]); break;
-		case 1: spell.ModifyStagger(consecutiveLerpLarge[consecutiveCasts]); break;
-		case 2: spell.ModifyStagger(consecutiveLerpLarge[consecutiveCasts] * consecutiveLerpSmall[consecutiveCasts]); break;
-		}
-	}
-
-	private void RepeatingCritChanceAugment(){
-		consecutiveStats [6] = true;
-		consecutiveStatFactors [6] += 1;
-	}
-
-	private void SporadicCritChanceAugment(){
-		consecutiveStats [6] = true;
-		consecutiveStatFactors [6] -= 1;
-	}
-
-	private void ConsecutiveCritChance(SpellEffectController spell){
-		switch (consecutiveStatFactors [6]) {
-		case -2: spell.ModifyCritChance(consecutiveLerpLarge[10 - consecutiveCasts] * consecutiveLerpSmall[10 - consecutiveCasts]); break;
-		case -1: spell.ModifyCritChance(consecutiveLerpLarge[10 - consecutiveCasts]); break;
-		case 1: spell.ModifyCritChance(consecutiveLerpLarge[consecutiveCasts]); break;
-		case 2: spell.ModifyCritChance(consecutiveLerpLarge[consecutiveCasts] * consecutiveLerpSmall[consecutiveCasts]); break;
-		}
-	}
-
-	private void RepeatingCritPowerAugment(){
-		consecutiveStats [7] = true;
-		consecutiveStatFactors [7] += 1;
-	}
-
-	private void SporadicCritPowerAugment(){
-		consecutiveStats [7] = true;
-		consecutiveStatFactors [7] -= 1;
-	}
-
-	private void ConsecutiveCritPower(SpellEffectController spell){
-		switch (consecutiveStatFactors [7]) {
-		case -2: spell.ModifyCritPower(consecutiveLerpLarge[10 - consecutiveCasts] * consecutiveLerpSmall[10 - consecutiveCasts]); break;
-		case -1: spell.ModifyCritPower(consecutiveLerpLarge[10 - consecutiveCasts]); break;
-		case 1: spell.ModifyCritPower(consecutiveLerpLarge[consecutiveCasts]); break;
-		case 2: spell.ModifyCritPower(consecutiveLerpLarge[consecutiveCasts] * consecutiveLerpSmall[consecutiveCasts]); break;
-		}
-	}
-
-	private void AttenuatingPowerAugment(SpellEffectController spell){
-		spell.SetAttenuatingDamage (1);
-	}
-
-	private void DampeningPowerAugment(SpellEffectController spell){
-		spell.SetAttenuatingDamage (-1);
-	}
-
-	private void AttenuatingStaggerAugment(SpellEffectController spell){
-		spell.SetAttenuatingStagger (1);	
-	}
-
-	private void DampeningStaggerAugment(SpellEffectController spell){
-		spell.SetAttenuatingStagger (-1);	
-	}
-
-	private void AttenuatingCritChanceAugment(SpellEffectController spell){
-		spell.SetAttenuatingCritChance (1);
-	}
-
-	private void DampeningCritChanceAugment(SpellEffectController spell){
-		spell.SetAttenuatingCritChance (-1);
-	}
-
-	private void AttenuatingCritPowerAugment(SpellEffectController spell){
-		spell.SetAttenuatingCritPower (1);
-	}
-
-	private void DampeningCritPowerAugment(SpellEffectController spell){
-		spell.SetAttenuatingCritPower (-1);
-	}
-
 	//applies spell effects
-	private void ApplyEffects(ProjectileController controller, SpellEffectController effects){
+	private void ApplyEffects(SpellEffectController effects){
 		for (int i = 0; i < 3; i++) {
-			switch (currentEffects [i]) {
+			switch (currentSpell.spellEffects [i]) {
 			case -1: break;
 			case 0: effects.HypnotisingEffect (); break;
 			case 1: effects.VorpalEffect (); break;
@@ -492,12 +194,6 @@ public class SpellController : MonoBehaviour {
 		}
 	}
 
-	private void ConsecutiveCast(){
-		if (consecutiveCasts < 10) {
-			consecutiveCasts++;
-		}
-	}
-
 	//switches to the previous spell slot
 	private void PrevSpell(){
 		currentSlot--;
@@ -514,28 +210,11 @@ public class SpellController : MonoBehaviour {
 
 	//switches spell slots to a specific index
 	private void SwitchSpellSlot(int slot){
-		consecutiveCasts = 0;
-		for (int i = 0; i < 8; i++) {
-			consecutiveStats [i] = false;
-			consecutiveStatFactors [i] = 0;
-		}
-
 		currentSlot = slot;
 		SpellSlotController nextSlot = spellSlots [slot];
-		currentBase = nextSlot.GetSpellBase ();
-		currentForm = nextSlot.GetSpellForm ();
-		currentKinetics = nextSlot.GetSpellKinetics ();
-		currentAugments = nextSlot.GetSpellAugments (); 
-		currentEffects = nextSlot.GetSpellEffects ();
-		for (int i = 0; i < 8; i++) {
-			currentStats[i] = nextSlot.GetSpellStats (i);
-		}
+        currentSpell = nextSlot.getSpell();
 
-		manaCost = currentStats [0];
-		cooldown = currentStats [1];
-		baseAccuracy = currentStats [4];
-
-		if ((currentForm + 1) % 8 == 0) vengefulSpell = true;
+		if ((currentSpell.spellForm) % 8 == 7) vengefulSpell = true;
 		else  vengefulSpell = false;
 
 		SetSpellIcons (slot);
@@ -559,11 +238,11 @@ public class SpellController : MonoBehaviour {
 		if (vengefulSpell) vengefulModifier = 1f + 0.1f * MissingHealthModifier ();
 		else vengefulModifier = 1f;
 
-		pController.SetSpeed (currentStats [3] * vengefulModifier);
-		sController.SetPower (currentStats [2] * vengefulModifier);
-		sController.SetStagger (currentStats [5] * vengefulModifier);
-		sController.SetCritChance (currentStats [6] * vengefulModifier);
-		sController.SetCritPower (currentStats [7] * vengefulModifier);
+		pController.SetSpeed (currentSpell.speed * vengefulModifier);
+		sController.SetPower (currentSpell.power * vengefulModifier);
+		sController.SetStagger (currentSpell.impact * vengefulModifier);
+		sController.SetCritChance (currentSpell.critChance * vengefulModifier);
+		sController.SetCritPower (currentSpell.critMultiplier * vengefulModifier);
 	}
 
 	//generates a random offset for the spell
@@ -584,19 +263,17 @@ public class SpellController : MonoBehaviour {
 
 	//generates the innacuracy spread of the projectile
 	private Vector3 GenerateSpread(float innacuracyMultiplier){
-		Vector3 rotation = new Vector3(0f, Random.Range(-realAccuracy, realAccuracy) * innacuracyMultiplier, 0f);
+		Vector3 rotation = new Vector3(0f, Random.Range(-(100 - currentSpell.accuracy), (100 - currentSpell.accuracy)) * innacuracyMultiplier, 0f);
 		return rotation;
 	}
 
 	//applies the effects of the spell
 	private void ApplySpellEffects(GameObject spell){
-		realAccuracy = baseAccuracy;
 		ProjectileController projectileController = spell.GetComponent<ProjectileController> ();
 		SpellEffectController effectController = spell.GetComponent<SpellEffectController> ();
 		SetStats (projectileController, effectController);
 		ApplyKinetics (projectileController);
-		ApplyAugments (projectileController, effectController, spell);
-		ApplyEffects (projectileController, effectController);
+		ApplyEffects (effectController);
 	}
 
 	//TODO CHANGE THIS SO ITS IN THE STAT CONTROLLER

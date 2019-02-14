@@ -18,56 +18,23 @@ public class SpellCraftMenu : MonoBehaviour {
 	[SerializeField] private Sprite[] playerIcons; //holds all the player choice icons
 	[SerializeField] private Image displayIcon; //icon being displayed
 	[SerializeField] private Text toolTipText; //the tooltip object
+    [SerializeField] private Image[] icons;
 
-	[SerializeField] private Image[] icons; 
-	[SerializeField] private Sprite[] baseIcons; //icons for each base spell
-	[SerializeField] private float[] baseCooldowns; //cooldowns for each base spell
-	[SerializeField] private float[] baseManaCosts; //mana costs for each base spell
-	[SerializeField] private float[] basePowers; //powers for each base spell
-	[SerializeField] private float[] baseSpeeds; //speeds for each base spell
-	[SerializeField] private float[] baseAccuracies; //accuracies for each base spell
-	[SerializeField] private float[] baseImpacts; //impacts for each base spell
-	[SerializeField] private float[] baseCritChances; //crit chance for each base spell
-	[SerializeField] private float[] baseCritMultipliers; //crit multiplier for each base spell
+    [SerializeField] private SpellBase[] baseRunes; //holds details of each spell base rune (fire, ice, rock etc)
+    [SerializeField] private SpellBase[] formRunes; //holds details of each spell form rune
+    [SerializeField] private SpellModifier[] effectRunes; //holds details of each spell effect rune
+    [SerializeField] private SpellModifier[] kineticRunes; //holds details of each spell kinetic rune
+    [SerializeField] private SpellModifier[] augmentRunes; //holds details of each spell augment rune
 
-	[SerializeField] private Sprite[] formIcons; //icons for each spell form
-	[SerializeField] private float[] formManaCosts; //mana costs for each spell form
-	[SerializeField] private float[] formCooldowns; //cooldowns for each spell form
-	[SerializeField] private float[] formPowers; //powers of each spell form
-	[SerializeField] private float[] formSpeeds; //speeds of each spell form
-	[SerializeField] private float[] formAccuracies; //accuracies for each spell form
-	[SerializeField] private float[] formImpacts; //impacts for each spell form
-	[SerializeField] private float[] formCritChances;  //crit chances for each spell form
-	[SerializeField] private float[] formCritMultipliers; //crit multipliers for each spell form
-	[SerializeField] private Sprite[] effectIcons; //icons for each effect
-	[SerializeField] private float[] effectManaCosts; //mana costs for each sprite
-	[SerializeField] private Sprite[] kineticIcons; //icons for each kinetic 
-	[SerializeField] private float[] kineticManaCosts; //mana costs for each kinetic
-	[SerializeField] private Sprite[] augmentIcons; //icons for each augment
-	[SerializeField] private float[] augmentManaCosts; //mana costs for each augment
-	[SerializeField] private Sprite blankIcon; //blank icon
-	private string[] spellDetails; //holds the current runes used in the spell (displayed in the GUI)
-	[SerializeField] private Text[] spellText; //the text objects to hold the spell details
-	private int currentDetail; //current detail being changed
+    [SerializeField] private Sprite blankIcon; //blank icon
+    private string[] spellDetails = new string[8]; //holds the current runes used in the spell (displayed in the GUI)
+    [SerializeField] private Text[] spellText; //the text objects to hold the spell details
+    private int currentDetail; //current detail being changed
+    private int currentRunePage = 0; //the current rune page
 
-	private int currentRunePage; //the current rune page
-	private int baseSpell;  //the base spell being used
-	private int spellForm; //the spell form being used
-	private int[] spellEffects; //the spell effets being used
-	private int[] spellAugments; //the spell augments being used
-	private int[] spellKinetics; //the spell kinetics being used
-	private Sprite currentIcon; //the current Icon of the spell
-	private float cooldown; //the current cooldown of the spell
-	private float manaCost; //the current mana cost of the spell
-	private float accuracy; //the current accuracy of the spell
-	private float power; //the current power of the spell
-	private float speed; //the current speed of the spell
-	private float stagger; //the current impact of the spell
-	private float critChance; //the current crit chance of the spell 
-	private float critPower; //the current crit power of the spell
-	private float[] spellStats; //holds the 8 variables above
-	private float powerMultiplier; //TODO Figure out what this is
-	private int currentEffectSlot; //the current effect slot 
+    [SerializeField] private Spell spell; //current spell being crafted
+
+    private int currentEffectSlot; //the current effect slot 
 	private int currentAugmentSlot; //the current augment slot
 	private int currentKineticSlot; //the current kinetic slot
 	private int currentIconSlot; //the current icon slot
@@ -75,33 +42,13 @@ public class SpellCraftMenu : MonoBehaviour {
 	private bool formPicked; //if the spell form has been picked
 	private bool iconPicked; //if a spell icon has been picked
 
-	// Use this for initialization
-	void Start () {
-		currentRunePage = 0;
-		baseSpell = 0;
-		spellForm = -1;
-		spellEffects = new int[3];
-		spellAugments = new int[3];
-		spellKinetics = new int[3];
-		spellDetails = new string[6];
-		currentIcon = blankIcon;
-
-		for (int i = 0; i < 3; i++) {
-			spellEffects [i] = -1;
-			spellAugments [i] = -1;
-			spellKinetics [i] = -1;
-		}
-
-		spellStats = new float[8];
-	}
-
-	//casts the spell if a base, form and icon have been picked, assigning it to the current spell slot in the SpellController
-	public void Cast(){
+    //casts the spell if a base, form and icon have been picked, assigning it to the current spell slot in the SpellController
+    public void Cast(){
 		if (basePicked) {
 			if (formPicked) {
 				if (iconPicked) {
 					CalculateSpellStats ();
-					spellController.Cast (baseSpell, spellForm, spellKinetics, spellAugments, spellEffects, spellStats, currentIcon);
+					spellController.Cast (spell);
 					pauseMenu.Resume ();
 					ResetSpell ();
 				} else toolTipText.text = "Please pick an Icon first";
@@ -180,34 +127,34 @@ public class SpellCraftMenu : MonoBehaviour {
 
 	//sets the spell form of the spell
 	public void SetForm(int formID, string formName){
-		formPicked = true;
 		ClearSpell ();
-		icons [currentIconSlot].sprite = formIcons [formID];
-		spellForm = formID;
-		spellDetails [1] = formName;
+        formPicked = true;
+        icons [currentIconSlot].sprite = formRunes[formID].icon;
+        spell.spellForm = formID;
+        spellDetails [1] = formName;
 		CalculateSpellStats ();
 	}
 
 	//sets an augment of the spell
 	public void SetAugment(int augmentID, string augmentName){
-		spellAugments [currentAugmentSlot] = augmentID;
-		icons [currentIconSlot].sprite = augmentIcons [augmentID];
+        spell.spellAugments[currentAugmentSlot] = augmentID;
+        icons [currentIconSlot].sprite = augmentRunes[augmentID].icon;
 		spellDetails [currentDetail] = augmentName;
 		CalculateSpellStats ();
 	}
 
 	//sets a kinetic of the spell
 	public void SetKinetic(int kineticID, string kineticName){
-		spellKinetics [currentKineticSlot] = kineticID;
-		icons [currentIconSlot].sprite = kineticIcons [kineticID];
+        spell.spellKinetics[currentKineticSlot] = kineticID;
+        icons [currentIconSlot].sprite = kineticRunes[kineticID].icon;
 		spellDetails [currentDetail] = kineticName;
 		CalculateSpellStats ();
 	}
 
 	//sets an effect of the spell
 	public void SetEffect(int effectID, string effectName){
-		spellEffects [currentEffectSlot] = effectID;
-		icons [currentIconSlot].sprite = effectIcons [effectID];
+        spell.spellEffects[currentEffectSlot] = effectID;
+        icons [currentIconSlot].sprite = effectRunes[effectID].icon;
 		spellDetails [currentDetail] = effectName;
 		CalculateSpellStats ();
 	}
@@ -225,24 +172,25 @@ public class SpellCraftMenu : MonoBehaviour {
 
 	//switches the current hex grid being displayed
 	private void SwitchHexGrid(int newHexGridNumber){
-		hexGrids [baseSpell].SetActive (false);
-		baseSpell = newHexGridNumber;
-		hexGrids [baseSpell].SetActive (true);
+		hexGrids [spell.spellBase].SetActive (false);
+        spell.spellBase = newHexGridNumber;
+		hexGrids [spell.spellBase].SetActive (true);
 		ClearSpell ();
 	}
 
 	//clears the current spell
 	public void ClearSpell(){
 
-		spellForm = 0;
+        formPicked = false;
+        spell.spellForm = -1;
 
 		for (int i = 0; i < 3; i++) {
-			spellEffects [i] = -1;
-			spellAugments [i] = -1;
-			spellKinetics [i] = -1;
-		}
+            spell.spellEffects[i] = -1;
+            spell.spellKinetics[i] = -1;
+            spell.spellAugments[i] = -1;
+        }
 
-		for (int i = 0; i < icons.Length; i++) {
+        for (int i = 0; i < icons.Length; i++) {
 			if (i % 6 != 0) {
 				icons [i].sprite = blankIcon; 
 			}
@@ -259,22 +207,22 @@ public class SpellCraftMenu : MonoBehaviour {
 		basePicked = false;
 		formPicked = false;
 		iconPicked = false;
-		hexGrids [baseSpell].SetActive (false);
-		baseSpell = 0;
-		spellForm = 0;
-		for (int i = 0; i < 3; i++) {
-			spellEffects [i] = -1;
-			spellAugments [i] = -1;
-			spellKinetics [i] = -1;
-		}
-		SwitchRunePage (0);
+		hexGrids [spell.spellBase].SetActive (false);
+        spell.spellBase = 0;
+        spell.spellForm = -1;
+        for (int i = 0; i < 3; i++) {
+            spell.spellEffects[i] = -1;
+            spell.spellKinetics[i] = -1;
+            spell.spellAugments[i] = -1;
+        }
+        SwitchRunePage (0);
 		for (int i = 0; i < icons.Length; i++) {
 			if (i % 6 != 0) {
 				icons [i].sprite = blankIcon; 
 			}
 		}
 		CalculateSpellStats ();
-		currentIcon = blankIcon;
+		spell.icon = blankIcon;
 		displayIcon.sprite = blankIcon;
 
 		for(int i = 0; i < 6; i++){
@@ -286,77 +234,48 @@ public class SpellCraftMenu : MonoBehaviour {
 	//calculates the mana cost of the spell
 	private void CalculateManaCost(){
 
-		if (spellForm != -1) {
-			manaCost = formManaCosts [spellForm] * baseManaCosts [baseSpell];
+		if (spell.spellForm != -1) {
+			spell.manaCost = formRunes[spell.spellForm].manaCost * baseRunes[spell.spellBase].manaCost;
 			for (int i = 0; i < 3; i++) {
-				if (spellEffects [i] != -1)
-					manaCost *= effectManaCosts [spellEffects [i]];
-				if (spellKinetics [i] != -1)
-					manaCost *= kineticManaCosts [spellKinetics [i]];
-				if (spellAugments [i] != -1)
-					manaCost *= augmentManaCosts [spellAugments [i]];
-			}
+				if (spell.spellEffects [i] != -1) spell.manaCost *= effectRunes[spell.spellEffects[i]].manaCost;
+                if (spell.spellKinetics [i] != -1) spell.manaCost *= kineticRunes[spell.spellKinetics[i]].manaCost;
+                if (spell.spellAugments [i] != -1) spell.manaCost *= augmentRunes[spell.spellAugments[i]].manaCost;
+            }
 		}
 	}
 
 	//calculates the spells stats
 	private void CalculateSpellStats(){
-		
-		CalculateManaCost ();
-		cooldown = formCooldowns [spellForm] * baseCooldowns [baseSpell];
-		power = formPowers[spellForm] * basePowers [baseSpell];
-		speed = formSpeeds[spellForm] * baseSpeeds [baseSpell];
-		accuracy = formAccuracies[spellForm] * baseAccuracies [baseSpell];
-		stagger = formImpacts[spellForm] * baseImpacts [baseSpell];
-		critChance = formCritChances[spellForm] * baseCritChances [baseSpell];
-		critPower = formCritMultipliers[spellForm] * baseCritMultipliers [baseSpell];
+        if (basePicked && formPicked) {
 
-		for (int i = 0; i < 3; i++) {
-			switch (spellAugments [i]) {
-			case 0: power *= 1.25f; break;
-			case 1: power *= 0.8f; break;
-			case 2: speed *= 1.5f; break;
-			case 3: speed *= 0.67f; break;
-			case 4: accuracy -= 2f; break;
-			case 5: accuracy += 2f; break;
-			case 6: stagger *= 2f; break;
-			case 7: stagger *= 0.5f; break;
-			case 8: critChance *= 2f; break;
-			case 9: critChance *= 0.5f; break;
-			case 10: critPower *= 2f; break;
-			case 11: critPower *= 0.5f; break;
-			case 12:
-				power *= 1.1f; 
-				speed *= 1.2f;
-				accuracy -= 1f;
-				stagger *= 1.5f;
-				critChance *= 1.5f;
-				critPower *= 1.5f; break;
-			case 13: 
-				power *= 0.91f; 
-				speed *= 0.82f;
-				accuracy += 1f; 
-				stagger *= 0.67f;
-				critChance *= 0.67f;
-				critPower *= 0.67f; break;	
-			case 14: cooldown *= 1.5f; break;
-			case 15: cooldown *= 0.67f; break;
-			}
-		}
+            CalculateManaCost();
+            spell.cooldown = formRunes[spell.spellForm].cooldown * baseRunes[spell.spellBase].cooldown;
+            spell.power = formRunes[spell.spellForm].power * baseRunes[spell.spellBase].power;
+            spell.speed = formRunes[spell.spellForm].speed * baseRunes[spell.spellBase].speed;
+            spell.accuracy = formRunes[spell.spellForm].accuracy * baseRunes[spell.spellBase].accuracy;
+            spell.impact = formRunes[spell.spellForm].impact * baseRunes[spell.spellBase].impact;
+            spell.critChance = formRunes[spell.spellForm].critChance * baseRunes[spell.spellBase].critChance;
+            spell.critMultiplier = formRunes[spell.spellForm].critMultiplier * baseRunes[spell.spellBase].critMultiplier;
 
-		spellStats [0] = manaCost;
-		spellStats [1] = cooldown;
-		spellStats [2] = power;
-		spellStats [3] = speed;
-		spellStats [4] = 100f - accuracy;
-		spellStats [5] = stagger;
-		spellStats [6] = critChance;
-		spellStats [7] = critPower;
+            for (int i = 0; i < 3; i++) {
+                switch (spell.spellAugments[i] % 8) {
+                    case 0: spell.power *= augmentRunes[spell.spellAugments[i]].modifier; break; //power rune 
+                    case 1: spell.speed *= augmentRunes[spell.spellAugments[i]].modifier; break; //speed rune
+                    case 2: spell.accuracy += augmentRunes[spell.spellAugments[i]].modifier; break; //accuracy rune
+                    case 3: spell.impact *= augmentRunes[spell.spellAugments[i]].modifier; break; //impact rune
+                    case 4: spell.critChance += augmentRunes[spell.spellAugments[i]].modifier; break; //crit chance rune
+                    case 5: spell.critMultiplier += augmentRunes[spell.spellAugments[i]].modifier; break; //crit multiplier rune
+                    case 6: spell.manaCost *= augmentRunes[spell.spellAugments[i]].modifier; break; //mana cost rune
+                    case 7: spell.cooldown *= augmentRunes[spell.spellAugments[i]].modifier; break; //cooldown rune
+                }
+            }
 
-		UpdateText ();
+            UpdateText(); //update UI Text
+        }
 	}
 
 	//updates the spell text in the crafting UI
+    //**TODO: Make this show spell stats (damage, accuracy etc etc)
 	private void UpdateText(){
 		int currentDetail = 0;
 
@@ -389,12 +308,57 @@ public class SpellCraftMenu : MonoBehaviour {
 	//sets the icon of the spell
 	public void SetIcon(int iconID){
 		iconPicked = true;
-		currentIcon = playerIcons [iconID];
-		displayIcon.sprite = currentIcon;
+		spell.icon = playerIcons [iconID];
+		displayIcon.sprite = spell.icon;
 	}
 
 	//sets on of the spell details in the crafting UI
 	public void SetDetail(int detailID){
 		currentDetail = detailID;
 	}
+}
+
+/* -----------------------------
+ *      Spell Structs 
+ * ----------------------------- */
+
+/* Used for spell bases, and spell forms */
+[System.Serializable]
+public struct SpellBase {
+    public Sprite icon; //icon of the base / form
+    public float cooldown; //cooldown of the base / form
+    public float manaCost; //mana cost of the base / form
+    public float power; //power fo the base / form
+    public float speed; //speed of the base / form
+    public float accuracy; //accuracy of the base / form
+    public float impact; //impact of the abse / form
+    public float critChance; //crit chance of the base / form
+    public float critMultiplier; //crit multiplier of the base / form
+}
+
+/* Used for spell effects, kinetics and augments */
+[System.Serializable]
+public struct SpellModifier {
+    public Sprite icon; //icon of the modifier
+    public float manaCost; //mana cost of the modifier
+    public float modifier; //any extra multiplier the modifier has 
+}
+
+/* Contains all spell parameters / effects */
+[System.Serializable]
+public struct Spell {
+    public Sprite icon; //icon of the spell
+    public int spellBase; //base rune of the spell
+    public int spellForm; //form rune of the spell
+    public int[] spellEffects; //effect runes of the spell
+    public int[] spellKinetics; //kinetic runes of the spell
+    public int[] spellAugments; //augment runes of the spell
+    public float cooldown; //cooldown of the spell
+    public float manaCost; //mana cost of the spell
+    public float power; //power fo the spell
+    public float speed; //speed of the spell
+    public float accuracy; //accuracy of the spell
+    public float impact; //impact of the spell
+    public float critChance; //crit chance of the spell
+    public float critMultiplier; //crit multiplier of the spell
 }

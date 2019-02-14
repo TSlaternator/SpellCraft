@@ -7,6 +7,7 @@ using UnityEngine.AI;
 public class RoomController : MonoBehaviour
 {
     [SerializeField] private GameObject floorPlane; //not visible in game, used to spawn a navmesh
+    private Transform enemiesList; //all enemies are spawned under this
     private bool[] doors; //which directions have doors (0 = N, 1 = E,  2 = S, 3 = W)
     private int[] doorCentres; //position of the door on direction corresponding to doors[]
     private float xCentre, zCentre; //centre point of the room
@@ -316,7 +317,7 @@ public class RoomController : MonoBehaviour
                     }
                 }
             }
-        }
+        } 
     }
 
     //Spawns decorated tiles on the floor
@@ -406,6 +407,7 @@ public class RoomController : MonoBehaviour
 
     //Spawns mobs in the room based on its threat value, and available mobs
     public void SpawnMobs(GameObject[] mobs, int[] mobThreatLevels, int roomThreatBonus) {
+        enemiesList = GameObject.Find("EnemiesList").transform;
         threat *= 100;
         threat += roomThreatBonus;
         int minThreatValue = getMin(mobThreatLevels);
@@ -429,7 +431,7 @@ public class RoomController : MonoBehaviour
             zPos = Random.Range(zCentre - height / 2, zCentre + height / 2);
             spawnPoint = new Vector3 (xPos, 0f, zPos);
             if (NavMesh.SamplePosition(spawnPoint, out hit, 0.1f, NavMesh.AllAreas)) {
-                Instantiate(mob, spawnPoint, Quaternion.identity);
+                Instantiate(mob, spawnPoint, Quaternion.identity, enemiesList);
                 spawned = true;
             } 
         }

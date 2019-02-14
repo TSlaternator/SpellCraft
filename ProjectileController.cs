@@ -10,6 +10,7 @@ public class ProjectileController : MonoBehaviour {
 	private SpriteRotationController sprite; //the RotationController of the spells sprite
 	private float speed; //the speed of the projectile
 	[SerializeField] private float turnrate; //the turnrate of the projectile
+    private Camera cam;
 
 	private bool guided; //if the projectile is guided, it will follow the cursor
 	private float lifetime = 5f; //the lifetime of the projectile
@@ -43,6 +44,7 @@ public class ProjectileController : MonoBehaviour {
 		body.velocity = velocity;
 		enemiesList = GameObject.Find ("EnemiesList");
 		sprite = GetComponentInChildren<SpriteRotationController> ();
+        cam = GameObject.Find("CameraPosition").GetComponentInChildren<Camera>();
 	}
 
 	//applies movement effects
@@ -265,7 +267,7 @@ public class ProjectileController : MonoBehaviour {
 
 	//seeks the cursor
 	private void GuideProjectile(){
-		Ray ray = Camera.main.ScreenPointToRay (Input.mousePosition);
+		Ray ray = cam.ScreenPointToRay (Input.mousePosition);
 		Plane playerPlane = new Plane (Vector3.up, transform.position);
 		float rayLength; 
 
