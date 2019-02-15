@@ -87,3 +87,14 @@ public interface IRoomTypeController {
     float[] getBreakablesChances();
 }
 
+public interface IEffectRune {
+
+    /* Interface to control Spell Effect Runes */
+
+    //applies the spell effect to the supplied game object
+    void ApplyEffect(GameObject enemy, SpellEffectController controller);
+
+    //Increases the potency of the effect
+    void IncreasePotency();
+}
+

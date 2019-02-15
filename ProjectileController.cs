@@ -77,7 +77,7 @@ public class ProjectileController : MonoBehaviour {
 	void OnTriggerEnter(Collider col){
 		ObstructionController other = col.GetComponent<ObstructionController> ();
 		if (other.enemy) {
-			other.GetComponent<EnemyStatController> ().ApplyDamage (effectController.GetDamage (other.GetComponent<EnemyStatController>()), effectController.GetType(), effectController.GetCrit(), false);
+			other.GetComponent<EnemyStatController> ().ApplyDamage (effectController.GetDamage (other.GetComponent<EnemyStatController>()), effectController.GetDamageType(), effectController.GetCrit(), false);
 			//other.GetComponent<EnemyController> ().ApplyImpact (effectController.GetImpact ());
 			effectController.ApplyEffects (other);
 			if (chaining && chainingTargets > 0) {

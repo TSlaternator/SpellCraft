@@ -6,8 +6,10 @@ using UnityEngine.AI;
 
 public class LevelGenerator : MonoBehaviour {
 
-	[SerializeField] private int levelWidth, levelHeight; //overall dimensions of the level
-	[SerializeField] private int minRoomSize, maxRoomSize; //max and min size a room can be
+    [SerializeField] private int levelWidth; //overall width of the level
+    [SerializeField] private int levelHeight; //overall height of the level
+    [SerializeField] private int minRoomSize;  //minimum size a room can be
+    [SerializeField] private int maxRoomSize; //maximum size a room can be
 	[SerializeField] private List<Room> rooms; //list of rooms in the level
 	[SerializeField] private List<RoomGroup> groups; //list of groups of rooms (used when joining up the level)
     [SerializeField] private List<CoridoorController> coridoorControllers; //used to build coridoors at the end of the generation

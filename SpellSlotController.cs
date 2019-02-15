@@ -11,11 +11,14 @@ public class SpellSlotController : MonoBehaviour {
 	[SerializeField] private Image spellIcon; //the Image component of the spell slot
 	[SerializeField] private Image previousSpell; //the Image component of the previous spell slot
 	[SerializeField] private Image nextSpell; //the Image component of the next spell slot
-    private Spell currentSpell; //spell held by this spell slot
+    [SerializeField] private Spell currentSpell; //spell held by this spell slot
 
     //Sets the spell held by this spell slot
     public void setSpell(Spell spell) {
         currentSpell = spell;
+        currentSpell.spellEffects = (int[])spell.spellEffects.Clone();
+        currentSpell.spellAugments = (int[])spell.spellAugments.Clone();
+        currentSpell.spellKinetics = (int[])spell.spellKinetics.Clone();
     }
 
     //gets the spell held by this spell slot

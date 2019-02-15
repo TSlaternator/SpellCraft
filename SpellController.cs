@@ -7,7 +7,7 @@ public class SpellController : MonoBehaviour {
 
 	/* Controls the spells the player is casting */
 
-	[SerializeField] private CameraShaker camera; //the cameraShaker object
+	[SerializeField] private CameraShaker cam; //the cameraShaker object
 	[SerializeField] private PlayerStatController playerStats; //reference to the players stats
 	[SerializeField] private SpellSlotController[] spellSlots; //reference to the players spell slots
 	[SerializeField] private int currentSlot; //index of the current spell slot
@@ -21,14 +21,12 @@ public class SpellController : MonoBehaviour {
 
 	private float nextCast; //next time a spell can be cast
 	private bool casting; //if the player is holding down the cast button
-	private float lastCast; //last time a spell was cast
 	private bool meditating; //if the player is meditating or not ******************* MAYBE MOVE THIS TO STAT CONTROLLER ***********************
 	private bool vengefulSpell; //if a spell is vengeful or not
 	private float vengefulModifier = 1f; //the modifier of vengefuls spells (NEED TO RE DO THIS)
 
 	//initialising variables
 	void Start(){
-		lastCast = Time.time;
 		nextCast = Time.time;
 		currentSlot = 0;
 	}
@@ -77,24 +75,14 @@ public class SpellController : MonoBehaviour {
 				if (casting && Time.time >= nextCast && playerStats.GetMana () >= currentSpell.manaCost && currentSpell.spellBase != 8) {
 
                     //casts a spell of the correct spellForm
-					if (currentSpell.spellForm < 8) {
-						CastProjectile (GeneratePosition (1f, 0), GenerateSpread (1f), 1f, 0);
-						lastCast = Time.time;
-					} else if (currentSpell.spellForm < 16) {
-						CastBurst ();
-						lastCast = Time.time;
-					} else if (currentSpell.spellForm < 24) {
-						CastSpread ();
-						lastCast = Time.time;
-					} else if (currentSpell.spellForm < 32) {
-						CastPulse ();
-						lastCast = Time.time;
-					}
+					if (currentSpell.spellForm < 8) CastProjectile (GeneratePosition (1f, 0), GenerateSpread (1f), 1f, 0);
+					else if (currentSpell.spellForm < 16) CastBurst ();
+					else if (currentSpell.spellForm < 24) CastSpread ();
+					else if (currentSpell.spellForm < 32) CastPulse ();
 
                     //Drain mana and reset cooldown
                     playerStats.DrainMana (currentSpell.manaCost);
 					nextCast = Time.time + currentSpell.cooldown;
-
 				} 
 			}
 		}
@@ -104,11 +92,12 @@ public class SpellController : MonoBehaviour {
 	public void Cast(Spell spell){
         currentSpell = spell;
 		spellSlots [currentSlot].setSpell (currentSpell);
+        SetSpellIcons(currentSlot);
 
-        //TODO: FIND A BETTER WAY TO COPY THE ARRAY //
-        currentSpell.spellEffects = new int[3] { spell.spellEffects[0], spell.spellEffects[1], spell.spellEffects[2] };
-        currentSpell.spellAugments = new int[3] { spell.spellAugments[0], spell.spellAugments[1], spell.spellAugments[2]};
-        currentSpell.spellKinetics = new int[3] { spell.spellKinetics[0], spell.spellKinetics[1], spell.spellKinetics[2]};
+        //Need to make a distinct copy rather than just reference the arrays
+        currentSpell.spellEffects = (int[])spell.spellEffects.Clone();
+        currentSpell.spellAugments = (int[])spell.spellAugments.Clone();
+        currentSpell.spellKinetics = (int[])spell.spellKinetics.Clone();
 
         if ((currentSpell.spellForm) % 8 == 7) vengefulSpell = true;
 		else vengefulSpell = false;
@@ -116,7 +105,7 @@ public class SpellController : MonoBehaviour {
 
 	//Casts a single projectile
 	private void CastProjectile(Vector3 castPoint, Vector3 spread, float scale, int castPointID){
-		StartCoroutine (camera.CameraShake (transform.position - castPoints[castPointID].position, currentSpell.manaCost/100f, 0.1f));
+		StartCoroutine (cam.CameraShake (transform.position - castPoints[castPointID].position, currentSpell.manaCost/100f, 0.1f));
 
         currentSpellObject = projectileSpells [currentSpell.spellBase];
 		GameObject spell = Instantiate (currentSpellObject, castPoint, castPoints[castPointID].rotation, projectileList);
@@ -174,22 +163,22 @@ public class SpellController : MonoBehaviour {
 		for (int i = 0; i < 3; i++) {
 			switch (currentSpell.spellEffects [i]) {
 			case -1: break;
-			case 0: effects.HypnotisingEffect (); break;
+            case 0: effects.AddEffect(0); break;
 			case 1: effects.VorpalEffect (); break;
-			case 2: effects.MarkingEffect (); break;
-			case 3: effects.SnaringEffect (); break;
-			case 4: effects.AlchemisingEffect (); break;
+			case 2: effects.AddEffect(1); break;
+			case 3: effects.AddEffect(2); break;
+			case 4: effects.AddEffect(3); break;
 			case 5: effects.ExecutingEffect (); break;
 			case 6: effects.ExplosiveEffect (); break;
-			case 7: effects.CrystalisingEffect (); break;
-			case 8: effects.StunningEffect (); break;
+			case 7: effects.AddEffect(4); break;
+			case 8: effects.AddEffect(5); break;
 			case 9: effects.DisintegratingEffect (); break;
-			case 10: effects.SlowingEffect (); break;
-			case 11: effects.EnfeeblingEffect (); break;
-			case 12: effects.LastingEffect (); break;
-			case 13: effects.WeakeningEffect (); break;
+			case 10: effects.AddEffect(7); break;
+			case 11: effects.AddEffect(8); break;
+			case 12: effects.AddEffect(9); break;
+			case 13: effects.AddEffect(10); break;
 			case 14: effects.RegicideEffect (); break;
-			case 15: effects.ManaDrainEffect (); break;
+			case 15: effects.AddEffect(11); break;
 			}
 		}
 	}
@@ -212,9 +201,14 @@ public class SpellController : MonoBehaviour {
 	private void SwitchSpellSlot(int slot){
 		currentSlot = slot;
 		SpellSlotController nextSlot = spellSlots [slot];
-        currentSpell = nextSlot.getSpell();
 
-		if ((currentSpell.spellForm) % 8 == 7) vengefulSpell = true;
+        Spell spell = nextSlot.getSpell();
+        currentSpell = spell;
+        currentSpell.spellEffects = (int[])spell.spellEffects.Clone();
+        currentSpell.spellAugments = (int[])spell.spellAugments.Clone();
+        currentSpell.spellKinetics = (int[])spell.spellKinetics.Clone();
+
+        if ((currentSpell.spellForm) % 8 == 7) vengefulSpell = true;
 		else  vengefulSpell = false;
 
 		SetSpellIcons (slot);
@@ -239,10 +233,8 @@ public class SpellController : MonoBehaviour {
 		else vengefulModifier = 1f;
 
 		pController.SetSpeed (currentSpell.speed * vengefulModifier);
-		sController.SetPower (currentSpell.power * vengefulModifier);
-		sController.SetStagger (currentSpell.impact * vengefulModifier);
-		sController.SetCritChance (currentSpell.critChance * vengefulModifier);
-		sController.SetCritPower (currentSpell.critMultiplier * vengefulModifier);
+        sController.setStats(currentSpell.power * vengefulModifier, currentSpell.impact * vengefulModifier, currentSpell.critChance * vengefulModifier, 
+                                currentSpell.critMultiplier * vengefulModifier);
 	}
 
 	//generates a random offset for the spell
