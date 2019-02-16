@@ -52,7 +52,7 @@ public class EnemyProjectileController : MonoBehaviour {
 		ObstructionController other = colider.GetComponent<ObstructionController> ();
 		if (other.obstructing) {
             if (other.tag == "Pillar") Physics.IgnoreCollision(colider, this.GetComponent<Collider>());
-			else Destroy (gameObject);
+            else Destroy(gameObject);
 		} else if (other.projectile) {
 			Physics.IgnoreCollision (colider, this.GetComponent<Collider> ());
 		}

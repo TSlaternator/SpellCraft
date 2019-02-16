@@ -8,7 +8,7 @@ public class EnemyController : MonoBehaviour {
 
     /* Controls enemy agents and their actions */
 
-    [SerializeField] private Transform castPoint; //the central cast point of the enemy
+    [SerializeField] private Transform castPoint;
 	[SerializeField] private float fireRate; // the fireRate of the enmy
 	[SerializeField] private float range; //the range the enemy can fire to
 	[SerializeField] private float staggerResist; //how resistant the enemy is to  staggering
@@ -94,7 +94,7 @@ public class EnemyController : MonoBehaviour {
 			}
 
 			animator.SetBool ("IsMoving", moving);
-		} 
+		}
 	}
 
 	//casts a spell (at the player)
