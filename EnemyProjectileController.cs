@@ -44,10 +44,6 @@ public class EnemyProjectileController : MonoBehaviour {
 		if (other.player) {
 			other.GetComponent<PlayerStatController> ().DealDamage (damage);
 		}
-
-		if (other.obstructing) {			
-				Destroy (gameObject);
-		}
 	}
 
 	//determines what the projectile does when it hits a physics collider
@@ -55,7 +51,8 @@ public class EnemyProjectileController : MonoBehaviour {
 		Collider colider = col.collider;
 		ObstructionController other = colider.GetComponent<ObstructionController> ();
 		if (other.obstructing) {
-				Destroy (gameObject);
+            if (other.tag == "Pillar") Physics.IgnoreCollision(colider, this.GetComponent<Collider>());
+			else Destroy (gameObject);
 		} else if (other.projectile) {
 			Physics.IgnoreCollision (colider, this.GetComponent<Collider> ());
 		}

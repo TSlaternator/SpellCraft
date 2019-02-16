@@ -78,7 +78,7 @@ public class ProjectileController : MonoBehaviour {
 		ObstructionController other = col.GetComponent<ObstructionController> ();
 		if (other.enemy) {
 			other.GetComponent<EnemyStatController> ().ApplyDamage (effectController.GetDamage (other.GetComponent<EnemyStatController>()), effectController.GetDamageType(), effectController.GetCrit(), false);
-			//other.GetComponent<EnemyController> ().ApplyImpact (effectController.GetImpact ());
+			other.GetComponent<EnemyController> ().ApplyImpact (effectController.GetImpact ());
 			effectController.ApplyEffects (other);
 			if (chaining && chainingTargets > 0) {
 				guided = false;
@@ -123,7 +123,7 @@ public class ProjectileController : MonoBehaviour {
 			} else {
 				DestroyThis();
 			}
-		} else if (other.projectile) {
+		} else if (other.enemyProjectile) {
 			if (blocking && blockCount > 0) {
 				Destroy (other.gameObject);
 				blockCount--;
@@ -133,7 +133,9 @@ public class ProjectileController : MonoBehaviour {
 			} else {
 				Physics.IgnoreCollision (colider, this.GetComponent<Collider> ());
 			}
-		}
+		} else {
+            Physics.IgnoreCollision(colider, this.GetComponent<Collider>());
+        }
 	}
 
 	//sets the speed of the projectile

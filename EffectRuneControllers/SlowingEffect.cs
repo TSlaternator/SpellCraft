@@ -7,7 +7,7 @@ public class SlowingEffect : MonoBehaviour, IEffectRune {
 
     //Has a chance to apply the Rune's effect on the enemy 
     public void ApplyEffect(GameObject enemy, SpellEffectController controller) {
-        if (Random.Range(0f, 1f) > slowChance) enemy.GetComponent<EnemyController>().ApplySlow();
+        if (Random.Range(0f, 1f) < slowChance) enemy.GetComponent<EnemyController>().ApplySlow();
     }
 
     //Increases the potency of the rune (by increasing its effect, chance to proc, or both)

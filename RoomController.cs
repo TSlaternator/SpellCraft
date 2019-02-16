@@ -397,16 +397,23 @@ public class RoomController : MonoBehaviour
 
     //spawns a pillar about the specified position, with the room types walls
     private void SpawnPillar(float xPos, float zPos, GameObject[] walls) {
-        Instantiate(walls[0], new Vector3(xPos, 1, zPos - 0.5f), Quaternion.identity, transform); //bottom section
-        Instantiate(walls[2], new Vector3(xPos, 1, zPos + 0.5f), Quaternion.identity, transform); //top section
-        Instantiate(walls[4], new Vector3(xPos - 1, 1, zPos - 0.5f), Quaternion.identity, transform); //bottom left section
-        Instantiate(walls[4], new Vector3(xPos - 1, 1, zPos + 0.5f), Quaternion.identity * Quaternion.Euler(0, 90f, 0), transform); //top left section
-        Instantiate(walls[4], new Vector3(xPos + 1, 1, zPos + 0.5f), Quaternion.identity * Quaternion.Euler(0, 180f, 0), transform); //top right section
-        Instantiate(walls[4], new Vector3(xPos + 1, 1, zPos - 0.5f), Quaternion.identity * Quaternion.Euler(0, 270f, 0), transform); //bottom right section
+        GameObject wall;
+        wall = Instantiate(walls[0], new Vector3(xPos, 1, zPos - 0.5f), Quaternion.identity, transform); //bottom section
+        wall.tag = "Pillar";
+        wall = Instantiate(walls[2], new Vector3(xPos, 1, zPos + 0.5f), Quaternion.identity, transform); //top section
+        wall.tag = "Pillar";
+        wall = Instantiate(walls[4], new Vector3(xPos - 1, 1, zPos - 0.5f), Quaternion.identity, transform); //bottom left section
+        wall.tag = "Pillar";
+        wall = Instantiate(walls[4], new Vector3(xPos - 1, 1, zPos + 0.5f), Quaternion.identity * Quaternion.Euler(0, 90f, 0), transform); //top left section
+        wall.tag = "Pillar";
+        wall = Instantiate(walls[4], new Vector3(xPos + 1, 1, zPos + 0.5f), Quaternion.identity * Quaternion.Euler(0, 180f, 0), transform); //top right section
+        wall.tag = "Pillar";
+        wall = Instantiate(walls[4], new Vector3(xPos + 1, 1, zPos - 0.5f), Quaternion.identity * Quaternion.Euler(0, 270f, 0), transform); //bottom right section
+        wall.tag = "Pillar";
         //Spawning breakables around the pillar (Currently decided not to use this, may change in future)
-       // SpawnBreakables(xPos - 2, zPos - 1.5f, 3, true);
-       // SpawnBreakables(xPos - 2, zPos - 1.5f, 2, false);
-       // SpawnBreakables(xPos + 2, zPos - 1.5f, 2, false);
+        // SpawnBreakables(xPos - 2, zPos - 1.5f, 3, true);
+        // SpawnBreakables(xPos - 2, zPos - 1.5f, 2, false);
+        // SpawnBreakables(xPos + 2, zPos - 1.5f, 2, false);
     }
 
     //Spawns mobs in the room based on its threat value, and available mobs

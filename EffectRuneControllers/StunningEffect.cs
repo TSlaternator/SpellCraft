@@ -7,7 +7,7 @@ public class StunningEffect : MonoBehaviour, IEffectRune {
 
     //Has a chance to apply the Rune's effect on the enemy 
     public void ApplyEffect(GameObject enemy, SpellEffectController controller) {
-        if (Random.Range(0f, 1f) > stunChance) enemy.GetComponent<EnemyController>().ApplyStun();
+        if (Random.Range(0f, 1f) < stunChance) enemy.GetComponent<EnemyController>().ApplyStun();
     }
 
     //Increases the potency of the rune (by increasing its effect, chance to proc, or both)

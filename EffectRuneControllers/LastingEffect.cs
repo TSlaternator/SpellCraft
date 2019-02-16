@@ -9,7 +9,7 @@ public class LastingEffect : MonoBehaviour, IEffectRune {
     //Has a chance to apply the Rune's effect on the enemy 
     public void ApplyEffect(GameObject enemy, SpellEffectController controller) {
 
-        if (Random.Range(0f, 1f) > DoTChance) {
+        if (Random.Range(0f, 1f) < DoTChance) {
             enemy.GetComponent<EnemyStatController>().ApplyDoT(controller.GetDamageType(), controller.GetPower() * DoTDamage);
         }
     }

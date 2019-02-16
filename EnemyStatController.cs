@@ -103,7 +103,7 @@ public class EnemyStatController : MonoBehaviour {
         col.enabled = false;
 		animator.SetBool ("IsDead", true);
 		isDead = true;
-		gameObject.GetComponent<EnemyController> ().isDead = true;
+		gameObject.GetComponent<EnemyController> ().Die();
 		if (!disintegrating) {
 			if (alchemised)
 				DropPickups ((int)(goldDropped * alchemyModifier), goldDrop);

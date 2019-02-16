@@ -7,7 +7,7 @@ public class HypnosisEffect : MonoBehaviour, IEffectRune {
 
     //Has a chance to apply the Rune's effect on the enemy 
     public void ApplyEffect(GameObject enemy, SpellEffectController controller) {
-        if (Random.Range(0f, 1f) > sleepChance) enemy.GetComponent<EnemyController>().ApplySleep();
+        if (Random.Range(0f, 1f) < sleepChance) enemy.GetComponent<EnemyController>().ApplySleep();
     }
 
     //Increases the potency of the rune (by increasing its effect, chance to proc, or both)

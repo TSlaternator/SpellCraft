@@ -6,8 +6,9 @@ using UnityEngine.UI;
 
 public class EnemyController : MonoBehaviour {
 
-	/* Controls enemy agents and their actions */
+    /* Controls enemy agents and their actions */
 
+    [SerializeField] private Transform castPoint; //the central cast point of the enemy
 	[SerializeField] private float fireRate; // the fireRate of the enmy
 	[SerializeField] private float range; //the range the enemy can fire to
 	[SerializeField] private float staggerResist; //how resistant the enemy is to  staggering
@@ -75,16 +76,16 @@ public class EnemyController : MonoBehaviour {
 					nextFire += Time.deltaTime;
 				} else if (snared) {
 					agent.SetDestination (transform.position);
-					if (Vector3.Magnitude (player.transform.position - transform.position) < range)
+					if (Vector3.Magnitude (player.transform.position - transform.position) < range && LineOfSight())
 						Cast ();
 				} else {
-					if (Vector3.Magnitude (player.transform.position - transform.position) > range) {
-						agent.SetDestination (player.transform.position);
-						moving = true;
+					if (Vector3.Magnitude (player.transform.position - transform.position) < range && LineOfSight()) {
+                        agent.SetDestination(transform.position);
+                        Cast();
 					} else {
-						agent.SetDestination (transform.position);
-						Cast ();
-					}
+                        agent.SetDestination(player.transform.position);
+                        moving = true;
+                    }
 				}
 
 				transform.LookAt (player.transform.position);
@@ -93,7 +94,7 @@ public class EnemyController : MonoBehaviour {
 			}
 
 			animator.SetBool ("IsMoving", moving);
-		}
+		} 
 	}
 
 	//casts a spell (at the player)
@@ -188,4 +189,25 @@ public class EnemyController : MonoBehaviour {
 		agent.speed /= 2f;
 		agent.angularSpeed /= 2f;
 	}
+
+    //returns true if the enemy can see the player, false if not
+    public bool LineOfSight() {
+        bool LOS = false;
+        RaycastHit hit;
+
+        if (Physics.Raycast(castPoint.position, player.transform.position - castPoint.position, out hit, range)) {
+            if (hit.collider.gameObject.tag == "Player") LOS = true;
+        }
+
+        return LOS;
+    }
+
+    //called when the enemy dies
+    public void Die() {
+        isDead = true;
+        moving = false;
+        agent.SetDestination(transform.position);
+        GetComponent<Collider>().enabled = false;
+        if (sleeping) Wake();
+    }
 }

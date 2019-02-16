@@ -16,7 +16,7 @@ public class SpellController : MonoBehaviour {
 	[SerializeField] private GameObject[] projectileSpells; //array of the different spell bases
 	[SerializeField] private Transform projectileList; //list to tidy up the interface
 
-    private Spell currentSpell; //current Spell the player will cast
+    [SerializeField] private Spell currentSpell; //current Spell the player will cast
 	private GameObject currentSpellObject; //the current spell being cast
 
 	private float nextCast; //next time a spell can be cast
