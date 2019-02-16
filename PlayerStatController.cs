@@ -50,6 +50,12 @@ public class PlayerStatController : MonoBehaviour {
 		}
 	}
 
+    //Heals the player by the amount provided
+    public void Heal(float amount) {
+        health += amount;
+        if (health > maxHealth) health = maxHealth;
+    }
+
 	//returns the current health of the player
 	public float GetHealth(){
 		return health;

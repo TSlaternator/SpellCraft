@@ -7,8 +7,12 @@ using UnityEngine.AI;
 public class RoomController : MonoBehaviour
 {
     [SerializeField] private GameObject floorPlane; //not visible in game, used to spawn a navmesh
+    [SerializeField] private GameObject manaDrop; //mana pickup that can drop when the room is completed
+    [SerializeField] private GameObject goldDrop; //gold pickup that can drop when the room is completed
+    [SerializeField] private GameObject healthDrop; //health pickup that can drop when the room is completed
     private Transform enemiesList; //all enemies are spawned under this
     private bool[] doors; //which directions have doors (0 = N, 1 = E,  2 = S, 3 = W)
+    private List<DoorController> doorControllers = new List<DoorController>(); //list of door controller scripts attached to the room
     private int[] doorCentres; //position of the door on direction corresponding to doors[]
     private float xCentre, zCentre; //centre point of the room
     private int width, height; //dimensions of the room
@@ -29,7 +33,7 @@ public class RoomController : MonoBehaviour
 
         //set collider bounds
         roomBounds = gameObject.GetComponent<BoxCollider>();
-        roomBounds.size = new Vector3(width + 2, 2f, height + 2);
+        roomBounds.size = new Vector3(width - 1f, 2f, height - 1f);
 
         //sets up the roomTypeController
         switch (roomType) {
@@ -324,7 +328,7 @@ public class RoomController : MonoBehaviour
     private void SpawnTileDecorations() {
         float decorationChance = Random.Range(0f, 1f);
         int decorationChoice;
-        if (decorationChance < roomTypeController.getCarpetChance()) {
+        if (decorationChance <= roomTypeController.getCarpetChance()) {
             decorationChoice = Random.Range(0, roomTypeController.getCarpetCount());
             tileGenerator.DrawCarpet(xCentre, zCentre, width, height, roomTypeController.getCarpetTiles(decorationChoice));
         } else if (decorationChance < roomTypeController.getBorderChance()) {
@@ -408,14 +412,14 @@ public class RoomController : MonoBehaviour
     //Spawns mobs in the room based on its threat value, and available mobs
     public void SpawnMobs(GameObject[] mobs, int[] mobThreatLevels, int roomThreatBonus) {
         enemiesList = GameObject.Find("EnemiesList").transform;
-        threat *= 100;
-        threat += roomThreatBonus;
+        float threatLevel = threat * 100;
+        threatLevel += roomThreatBonus;
         int minThreatValue = getMin(mobThreatLevels);
-        while (threat >= minThreatValue) {
+        while (threatLevel >= minThreatValue) {
             int mobToSpawn = Random.Range(0, mobThreatLevels.Length);
-            if (threat >= mobThreatLevels[mobToSpawn]) {
+            if (threatLevel >= mobThreatLevels[mobToSpawn]) {
                 SpawnMob(mobs[mobToSpawn]);
-                threat -= mobThreatLevels[mobToSpawn];
+                threatLevel -= mobThreatLevels[mobToSpawn];
             }
         } 
     }
@@ -444,6 +448,52 @@ public class RoomController : MonoBehaviour
             if (values[i] < answer) answer = values[i];
         }
         return answer;
+    }
+
+    //drops rewards to players upon them clearing the room
+    public void DropRewards() {
+        if (threat >= 0.25f) {
+            int goldToDrop = (int)(loot * 10);
+            int manaToDrop = (int)(essence * 10);
+            int healthToDrop = (int)(threat * 4);
+
+            SpawnPickups(goldDrop, goldToDrop);
+            SpawnPickups(manaDrop, manaToDrop);
+            SpawnPickups(healthDrop, healthToDrop);
+        }
+    }
+
+    //spawns pickups upon room completion
+    public void SpawnPickups(GameObject pickup, int amount) {
+        for(int i = 0; i < amount; i++) {
+            Instantiate(pickup, transform.position + GenerateOffset(), Quaternion.identity);
+        }
+    }
+
+    //generates a random offset to spawn pickups at
+    private Vector3 GenerateOffset() {
+        float offsetX = Random.Range(-0.5f, 0.5f);
+        float offsetZ = Random.Range(-0.5f, 0.5f);
+        return new Vector3(offsetX, 0f, offsetZ);
+    }
+
+    //Adds a door to the rooms list of doors
+    public void AddDoor(DoorController door) {
+        doorControllers.Add(door);
+    }
+
+    //Locks the doors when player enter a room with enemies
+    public void LockDoors() {
+        for(int i = 0; i < doorControllers.Count; i++) {
+            doorControllers[i].LockDoor();
+        }
+    }
+
+    //Unlocks the doors when a player clears a room with enemies
+    public void UnlockDoors() {
+        for (int i = 0; i < doorControllers.Count; i++) {
+            doorControllers[i].UnlockDoor();
+        }
     }
 }
 

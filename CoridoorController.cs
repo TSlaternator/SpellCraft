@@ -15,6 +15,8 @@ public class CoridoorController : MonoBehaviour {
     [SerializeField] private GameObject southWall; //walls along the south of the coridoors
     [SerializeField] private GameObject door; //door object
     [SerializeField] private GameObject sideDoor; //side door object
+    private Room firstRoom; //room on the left (or top) side of the coridoor
+    private Room secondRoom; //room on the right (or bottom) side of the coridoor
 
     //spawns the coridoors tiles
     public void SpawnCoridoor() {
@@ -50,17 +52,25 @@ public class CoridoorController : MonoBehaviour {
             if (room1.getXCentre() > room2.getXCentre()) {
                 if (room1.getController().setDoor(1, (int)zCentre)) success = false;
                 if (room2.getController().setDoor(3, (int)zCentre)) success = false;
+                firstRoom = room2;
+                secondRoom = room1;
             } else {
                 if (room1.getController().setDoor(3, (int)zCentre)) success = false;
                 if (room2.getController().setDoor(1, (int)zCentre)) success = false;
+                firstRoom = room1;
+                secondRoom = room2;
             }
         } else {
             if (room1.getZCentre() > room2.getZCentre()) {
                 if (room1.getController().setDoor(2, (int)xCentre)) success = false;
                 if (room2.getController().setDoor(0, (int)xCentre)) success = false;
+                firstRoom = room1;
+                secondRoom = room2;
             } else {
                 if (room1.getController().setDoor(0, (int)xCentre)) success = false;
                 if (room2.getController().setDoor(2, (int)xCentre)) success = false;
+                firstRoom = room2;
+                secondRoom = room1;
             }
         }
         return success;
@@ -95,10 +105,12 @@ public class CoridoorController : MonoBehaviour {
             else spawnPos = new Vector3(xCentre - 0.1f + width / 2, 0, zCentre - 0.5f);
             thisDoor = Instantiate(sideDoor, spawnPos, Quaternion.identity * Quaternion.Euler(0, 90, 0), gameObject.transform);
             thisDoor.GetComponent<DoorController>().setFacing(1);
+            secondRoom.getController().AddDoor(thisDoor.GetComponent<DoorController>());
             if (evenLength) spawnPos = new Vector3(xCentre - 0.4f - width / 2, 0, zCentre - 0.5f);
             else spawnPos = new Vector3(xCentre - 0.9f - width / 2, 0, zCentre - 0.5f);
             thisDoor = Instantiate(sideDoor, spawnPos, Quaternion.identity * Quaternion.Euler(0, -90, 0), gameObject.transform);
             thisDoor.GetComponent<DoorController>().setFacing(3);
+            firstRoom.getController().AddDoor(thisDoor.GetComponent<DoorController>());
         } else {
             evenLength = (height % 2 == 0) ? true : false;
             //side walls
@@ -115,10 +127,12 @@ public class CoridoorController : MonoBehaviour {
             else spawnPos = new Vector3(xCentre - 0.5f, 0, zCentre - 0.1f + height / 2);
             thisDoor = Instantiate(door, spawnPos, Quaternion.identity, gameObject.transform);
             thisDoor.GetComponent<DoorController>().setFacing(0);
+            firstRoom.getController().AddDoor(thisDoor.GetComponent<DoorController>());
             if (evenLength) spawnPos = new Vector3(xCentre - 0.5f, 0, zCentre - 0.4f - height / 2);
             else spawnPos = new Vector3(xCentre - 0.5f, 0, zCentre - 0.9f - height / 2);
             thisDoor = Instantiate(door, spawnPos, Quaternion.identity * Quaternion.Euler(0, 180, 0), gameObject.transform);
             thisDoor.GetComponent<DoorController>().setFacing(2);
+            secondRoom.getController().AddDoor(thisDoor.GetComponent<DoorController>());
         }
     }
 }

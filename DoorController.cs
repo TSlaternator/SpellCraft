@@ -9,27 +9,34 @@ public class DoorController : MonoBehaviour {
 	[SerializeField] private GameObject leftDoor; //the left door gameObject
 	[SerializeField] private GameObject rightDoor; //the right door gameObject
 	private bool isOpen; //whether the door is open or not
+    private bool isLocked; //whether the door is locked or not
     private int doorFacing; //which wall the door is on (used to determine open/close direction)
-    
+    private Collider playerCollider;
+
+    //get the players collider
+    private void Start() {
+        playerCollider = GameObject.FindWithTag("Player").GetComponent<Collider>();
+    }
+
     //controls what happens when something collides with the door
     void OnCollisionEnter(Collision other){
 		if (isOpen) {
 			Physics.IgnoreCollision (other.collider, this.GetComponent<Collider> ());
 		}
 
-		if (!isOpen && other.gameObject.tag == "Player") {
+		if (!isLocked && !isOpen && other.gameObject.tag == "Player") {
 			Physics.IgnoreCollision (other.collider, this.GetComponent<Collider> ());
-		}
+        }
 	} 
 
     //controls what happens when the player collides with the door
     private void OnTriggerEnter(Collider other) {
-        if (!isOpen && other.gameObject.tag == "Player") Open();
+        if (!isLocked && !isOpen && other.gameObject.tag == "Player") Open();
     }
 
     //controls what happens then the player stops colliding with the door
     private void OnTriggerExit(Collider other) {
-       if (isOpen && other.gameObject.tag == "Player") Close();
+        if (isOpen && other.gameObject.tag == "Player")  Close();
     }
 
     //opens the door
@@ -54,6 +61,7 @@ public class DoorController : MonoBehaviour {
             RotateClosedSide(1, rightDoor);
             RotateClosedSide(-1, leftDoor);
         }
+        Physics.IgnoreCollision(playerCollider, this.GetComponent<Collider>(), false);
     }
 
 	//rotates the door sprites open
@@ -87,5 +95,19 @@ public class DoorController : MonoBehaviour {
     //sets the door facing
     public void setFacing(int facing) {
         doorFacing = facing;
+    }
+
+    //Locks the door
+    public void LockDoor() {
+        isLocked = true;
+        if (isOpen) {
+            isOpen = false;
+            Close();
+        } 
+    }
+
+    //Unlocks the door
+    public void UnlockDoor() {
+        isLocked = false;
     }
 }

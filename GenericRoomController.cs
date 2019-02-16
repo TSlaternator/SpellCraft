@@ -5,16 +5,25 @@ using UnityEngine.Tilemaps;
 
 public class GenericRoomController : MonoBehaviour, IRoomTypeController {
 
+    private Transform enemies; //list of enemies
     private LevelGenerator generator; //the level generator script
     private TileMapController tileController; //the tile map controller script
     private RoomController roomController; //room controller script of this room
     private bool explored = false; //will turn true once the room has been entered
+    private bool complete = false; //when true, player will be rewarded for completing the room
     private float xCentre, zCentre; //center of the room
     private int width, height; //dimensions of the room
     private float carpetChance = 0.3f; //chances of spawning a carpet
     private float borderChance = 0.8f; //chances of spawning a border
     private float pillarChance = 0.4f; //chances of spawning a pillar at applicable points
     private float obstructionChance = 0.8f; //chances of spawning an obstruction at applicable points
+
+    //checks to see if the room is complete
+    void Update() {
+        if (explored && !complete) {
+            if (enemies.childCount == 0) OnRoomComplete();
+        }
+    }
 
     //called when the room is first spawned
     public void SpawnRoom(float xCentre, float zCentre, int width, int height) {
@@ -33,6 +42,8 @@ public class GenericRoomController : MonoBehaviour, IRoomTypeController {
             tileController.RemoveFog(xCentre, zCentre, width, height);
             roomController = gameObject.GetComponent<RoomController>();
             roomController.SpawnMobs(generator.mobRoom.mobs, generator.mobRoom.mobThreatValues, 0);
+            enemies = GameObject.Find("EnemiesList").transform;
+            roomController.LockDoors();
         }
     }
 
@@ -43,7 +54,10 @@ public class GenericRoomController : MonoBehaviour, IRoomTypeController {
 
     //controls what happens when the room is 'completed' (all enemies/boss killed)
     public void OnRoomComplete() {
-
+        Debug.Log("Room Complete!");
+        complete = true;
+        roomController.UnlockDoors();
+        roomController.DropRewards();
     }
 
     //gets the wall components for this room type

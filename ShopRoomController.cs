@@ -10,8 +10,8 @@ public class ShopRoomController : MonoBehaviour, IRoomTypeController {
     private bool explored = false; //will turn true once the room has been entered
     private float xCentre, zCentre; //center of the room
     private int width, height; //dimensions of the room
-    private float carpetChance = 0.6f; //chances of spawning a carpet
-    private float borderChance = 0.8f; //chances of spawning a border
+    private float carpetChance = 1f; //chances of spawning a carpet
+    private float borderChance = 1f; //chances of spawning a border
     private float pillarChance = 0f; //chances of spawning a pillar at applicable points
     private float obstructionChance = 0.95f; //chances of spawning an obstruction at applicable points
 

@@ -34,5 +34,6 @@ public class PlayerMoveController : MonoBehaviour {
 	//applies movement to the player
 	void FixedUpdate (){
 		body.velocity = moveVelocity;
+        if (transform.position.y != 0.5f) transform.position = new Vector3(transform.position.x, 0.5f, transform.position.z);
 	}
 }

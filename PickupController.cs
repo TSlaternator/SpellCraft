@@ -36,7 +36,8 @@ public class PickupController : MonoBehaviour {
 			switch (pickupType) {
 			case 0: playerInvent.EditGold (pickupValue); break;
 			case 1: playerStats.AddMana(pickupValue); break;
-			}
+            case 2: playerStats.Heal(pickupValue); break;
+            }
 		}
 
 		Destroy (gameObject);

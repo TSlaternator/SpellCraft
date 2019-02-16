@@ -114,6 +114,7 @@ public class EnemyStatController : MonoBehaviour {
 			else
 				DropPickups (manaDropped, manaDrop);
 		}
+        gameObject.transform.SetParent(null);
 		StartCoroutine (CorpseTime ());
 	}
 
