@@ -17,11 +17,16 @@ public class CoridoorController : MonoBehaviour {
     [SerializeField] private GameObject sideDoor; //side door object
     private Room firstRoom; //room on the left (or top) side of the coridoor
     private Room secondRoom; //room on the right (or bottom) side of the coridoor
+    [SerializeField] private GameObject minimapFloor; //floor object used for the minimap
+    [SerializeField] private GameObject minimapDoor; //door object used for the minimap
+    private GameObject minimapComponent;
+
 
     //spawns the coridoors tiles
     public void SpawnCoridoor() {
         tileGenerator.DrawCoridoor(xCentre, zCentre, width, height);
         SpawnWalls();
+        SpawnMinimapCoridoor();
     }
 
     //removes fog of war when the player first enters
@@ -29,6 +34,7 @@ public class CoridoorController : MonoBehaviour {
         if (other.tag == "Player" && !explored) {
             explored = true;
             tileGenerator.RemoveFog(xCentre, zCentre, width, height);
+            minimapComponent.SetActive(true);
         }
     }
 
@@ -134,5 +140,34 @@ public class CoridoorController : MonoBehaviour {
             thisDoor.GetComponent<DoorController>().setFacing(2);
             secondRoom.getController().AddDoor(thisDoor.GetComponent<DoorController>());
         }
+    }
+
+    //spawns a parallel version of the coridoor used in the minimap
+    public void SpawnMinimapCoridoor() {
+        Vector3 spawnPos;
+        GameObject door;
+        bool evenLength;
+        if (isHorizontal) {
+            evenLength = (width % 2 == 0) ? true : false;
+            //doors
+            spawnPos = new Vector3(xCentre + width / 2, 100, zCentre);
+            door = Instantiate(minimapDoor, spawnPos, Quaternion.identity, gameObject.transform);
+            secondRoom.getController().AddMinimapComponent(door);
+            spawnPos = new Vector3(xCentre - width / 2, 100, zCentre);
+            door = Instantiate(minimapDoor, spawnPos, Quaternion.identity, gameObject.transform);
+            firstRoom.getController().AddMinimapComponent(door);
+        } else {
+            evenLength = (height % 2 == 0) ? true : false;
+            //doors
+            spawnPos = new Vector3(xCentre, 100, zCentre + height / 2);
+            door = Instantiate(minimapDoor, spawnPos, Quaternion.identity * Quaternion.Euler(0, 90, 0), gameObject.transform);
+            firstRoom.getController().AddMinimapComponent(door);
+            spawnPos = new Vector3(xCentre, 100, zCentre - height / 2);
+            door = Instantiate(minimapDoor, spawnPos, Quaternion.identity * Quaternion.Euler(0, 90, 0), gameObject.transform);
+            secondRoom.getController().AddMinimapComponent(door);
+        }
+        minimapComponent = Instantiate(minimapFloor, new Vector3(xCentre, 99.5f, zCentre), Quaternion.identity, gameObject.transform);
+        minimapComponent.transform.localScale = new Vector3(minimapComponent.transform.localScale.x * width, minimapComponent.transform.localScale.y, minimapComponent.transform.localScale.z * height);
+        minimapComponent.SetActive(false);
     }
 }

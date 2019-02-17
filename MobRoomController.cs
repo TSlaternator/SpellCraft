@@ -45,6 +45,7 @@ public class MobRoomController : MonoBehaviour, IRoomTypeController{
             roomController.SpawnMobs(generator.mobRoom.mobs, generator.mobRoom.mobThreatValues, extraThreatValue);
             enemies = GameObject.Find("EnemiesList").transform;
             roomController.LockDoors();
+            GetComponent<RoomController>().AddToMiniMap();
         }
     }
 
@@ -151,5 +152,10 @@ public class MobRoomController : MonoBehaviour, IRoomTypeController{
     //Returns the chances of each breakable object spawning
     public float[] getBreakablesChances() {
         return generator.mobRoom.breakablesChances;
+    }
+
+    //Returns the minimap floor object for the room
+    public GameObject getMinimapFloor() {
+        return generator.mobRoom.minimapFloor;
     }
 }

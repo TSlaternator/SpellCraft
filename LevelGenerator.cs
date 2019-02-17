@@ -453,6 +453,7 @@ public struct RoomType { //holds aesthetic elements unique to each room type (li
     public float[] breakablesChances; //chances of each breakable spawning
     public GameObject[] mobs; //list of mobs that can spawn in the room
     public int[] mobThreatValues; //threat values of those mobs
+    public GameObject minimapFloor; //the minimap floor object of the room
 }
 
 [System.Serializable]

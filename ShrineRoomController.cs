@@ -31,6 +31,7 @@ public class ShrineRoomController : MonoBehaviour, IRoomTypeController {
             explored = true;
             tileController = GameObject.Find("LevelManager").GetComponent<TileMapController>();
             tileController.RemoveFog(xCentre, zCentre, width, height);
+            GetComponent<RoomController>().AddToMiniMap();
         }
     }
 
@@ -133,5 +134,10 @@ public class ShrineRoomController : MonoBehaviour, IRoomTypeController {
     //Returns the chances of each breakable object spawning
     public float[] getBreakablesChances() {
         return generator.shrineRoom.breakablesChances;
+    }
+
+    //Returns the minimap floor object for the room
+    public GameObject getMinimapFloor() {
+        return generator.shrineRoom.minimapFloor;
     }
 }

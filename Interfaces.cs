@@ -85,6 +85,9 @@ public interface IRoomTypeController {
 
     //Returns the chances of each breakable object spawning
     float[] getBreakablesChances();
+
+    //Returns the floor type of the minimap version of the room
+    GameObject getMinimapFloor();
 }
 
 public interface IEffectRune {

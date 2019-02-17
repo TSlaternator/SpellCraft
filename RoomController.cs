@@ -23,6 +23,7 @@ public class RoomController : MonoBehaviour
     private IRoomTypeController roomTypeController; //allows different room types to have different designs
     private BoxCollider roomBounds; //allows detection of the player entering or leaving the room
     private coordinates[] nodes; //nodes that can spawn an obstacle (table, pillar etc)
+    private List<GameObject> minimapComponents = new List<GameObject>(); //minimap components of the room
 
     //spawns the physical room
     public void SpawnRoom() {
@@ -56,6 +57,12 @@ public class RoomController : MonoBehaviour
         tileGenerator.DrawFog(xCentre, zCentre, width, height); //Darkening rooms until they're explored
         roomTypeController.SpawnRoom(xCentre, zCentre, width, height);
         SpawnTileDecorations();
+
+        //setting up the rooms minimap components
+        GameObject MMFloor = Instantiate(roomTypeController.getMinimapFloor(), new Vector3(xCentre, 99.5f, zCentre ), Quaternion.identity, gameObject.transform);
+        MMFloor.transform.localScale = new Vector3(MMFloor.transform.localScale.x * width, MMFloor.transform.localScale.y, MMFloor.transform.localScale.z * height);
+        minimapComponents.Add(MMFloor);
+        MMFloor.SetActive(false);
 
         //Generating obstacles (pillars, tables etc)
         CreateNodes();
@@ -136,6 +143,7 @@ public class RoomController : MonoBehaviour
     public void SpawnWalls(GameObject[] walls) {
         Vector3 spawnPos;
         GameObject thisWall;
+        GameObject MMWall;
         Transform wallTexture;
         float firstCorner, secondCorner, wallSize;
         //north wall
@@ -500,6 +508,19 @@ public class RoomController : MonoBehaviour
     public void UnlockDoors() {
         for (int i = 0; i < doorControllers.Count; i++) {
             doorControllers[i].UnlockDoor();
+        }
+    }
+
+    //Adds a minimap component that will show up once the room is explored
+    public void AddMinimapComponent(GameObject component) {
+        minimapComponents.Add(component);
+        component.SetActive(false);
+    }
+
+    //highlights the room on the minimap
+    public void AddToMiniMap() {
+        for (int i = 0; i < minimapComponents.Count; i++) {
+            minimapComponents[i].SetActive(true);
         }
     }
 }
