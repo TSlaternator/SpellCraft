@@ -17,10 +17,10 @@ public class RuneButtonController : MonoBehaviour {
 
 	//updates the current hex with the rune this button is controlling
 	public void PressButton(){
-		if (augment) menu.SetAugment (runeID, name);
-		else if (kinetic) menu.SetKinetic (runeID, name);
-		else if (effect) menu.SetEffect (runeID, name);
-		else if (form) menu.SetForm (runeID, name);
-		else if (baseSpell) menu.SetBase (runeID, name);
+		if (augment) menu.SetAugment (runeID, -1);
+		else if (kinetic) menu.SetKinetic (runeID, -1);
+		else if (effect) menu.SetEffect (runeID, -1);
+		else if (form) menu.SetForm (runeID, -1, true);
+		else if (baseSpell) menu.SetBase (runeID, true);
 	}
 }

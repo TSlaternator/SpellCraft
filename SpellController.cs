@@ -103,6 +103,11 @@ public class SpellController : MonoBehaviour {
 		else vengefulSpell = false;
 	}
 
+    //Returns the currently cast spell
+    public Spell getSpell() {
+        return currentSpell;
+    }
+
 	//Casts a single projectile
 	private void CastProjectile(Vector3 castPoint, Vector3 spread, float scale, int castPointID){
 		StartCoroutine (cam.CameraShake (transform.position - castPoints[castPointID].position, currentSpell.manaCost/100f, 0.1f));
@@ -198,7 +203,7 @@ public class SpellController : MonoBehaviour {
 	}
 
 	//switches spell slots to a specific index
-	private void SwitchSpellSlot(int slot){
+	public void SwitchSpellSlot(int slot){
 		currentSlot = slot;
 		SpellSlotController nextSlot = spellSlots [slot];
 
@@ -272,6 +277,11 @@ public class SpellController : MonoBehaviour {
 	public bool GetMeditating(){
 		return meditating;
 	}
+
+    //returns the current active spell slot
+    public int getSpellSlot() {
+        return currentSlot;
+    }
 
 	//used for Vengeful spells
 	private int MissingHealthModifier(){

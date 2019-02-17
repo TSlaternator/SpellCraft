@@ -24,19 +24,16 @@ public class ButtonController : MonoBehaviour {
 	//sets the hex being changed to an effect hex
 	public void Effect(){
 		spellMenu.Effect (buttonTypeNumber, buttonID);
-		spellMenu.SetDetail (hexID);
 	}
 
 	//sets the hex being changed to a kinetic hex
 	public void Kinetic(){
 		spellMenu.Kinetic (buttonTypeNumber, buttonID);
-		spellMenu.SetDetail (hexID);
 	}
 
 	//sets the hex being changed to an augment hex
 	public void Augment(){
 		spellMenu.Augment (buttonTypeNumber, buttonID);
-		spellMenu.SetDetail (hexID);
 	}
 
 }

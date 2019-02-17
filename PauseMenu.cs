@@ -12,6 +12,8 @@ public class PauseMenu : MonoBehaviour {
 	[SerializeField] private SpellCraftMenu spellMenu; //reference to the spell crafting menu
 	[SerializeField] private Texture2D cursorSprite; //custom cursor sprite used in the game
 	[SerializeField] private GameObject hudUI; //reference to the HUD UI
+    [SerializeField] private SpellController spellController; //reference to the spell controller script
+    [SerializeField] private SpellCraftMenu spellCraftMenu; //reference to the spell craft menu script
 
 	//pauses (or unpauses) the game when ESCAPE is pressed
 	void Update () {
@@ -47,6 +49,7 @@ public class PauseMenu : MonoBehaviour {
 	//opens the spell crafting menu
 	public void SpellMenu(){
 		spellMenuUI.SetActive (true);
+        spellCraftMenu.LoadSpell(spellController.getSpellSlot());
 		pauseMenuUI.SetActive (false);
 	}
 
