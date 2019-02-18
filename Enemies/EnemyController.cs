@@ -118,7 +118,7 @@ public class EnemyController : MonoBehaviour {
 	public void ApplyImpact(float impact){
 		if (sleeping && wakeable) Wake ();
 		knockbackDuration = impact * (1 - staggerResist);
-		StartCoroutine (Knockback (knockbackDuration));
+		//StartCoroutine (Knockback (knockbackDuration));
 	}
 
 	//while knocked back, the agent won't be able to cast / move

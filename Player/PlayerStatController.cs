@@ -7,23 +7,25 @@ public class PlayerStatController : MonoBehaviour {
 
 	/* Controls the players stats and allows things to affect those stats */
 
-	[SerializeField] public float maxHealth; //maximum health of the player
+	[SerializeField] private float maxHealth; //maximum health of the player
 	private float health; //current health of the player
 	private float healthPercentage; //current health percentage of the player
-	[SerializeField] Image healthBar; //reference to the players health bar
-	[SerializeField] Text healthText; //reference to the health text in the HUD
+	[SerializeField] private Image healthBar; //reference to the players health bar
+	[SerializeField] private Text healthText; //reference to the health text in the HUD
 
 	[SerializeField] float maxMana; //maximum mana of the player
 	private float mana; //current mana of the player 
 	private float manaPercentage; //current mana percentage of the player
-	[SerializeField] Image manaBar; //reference to the players mana bar
-	[SerializeField] Text manaText; //reference to the mana text in the HUD
-	[SerializeField] float manaRechargeRate; //how fast the players mana regenerates
+	[SerializeField] private Image manaBar; //reference to the players mana bar
+	[SerializeField] private Text manaText; //reference to the mana text in the HUD
+	[SerializeField] private float manaRechargeRate; //how fast the players mana regenerates
+    [SerializeField] private playerMultipliers spellMultipliers; //applied to any spell cast
 
 	//initialises stats
 	void Start(){
 		health = maxHealth;
 		mana = maxMana;
+        
 	}
 
 	//updates current stat percentages and bars, regenerates mana 
@@ -94,4 +96,22 @@ public class PlayerStatController : MonoBehaviour {
 	public void SetManaRecharge(float multiplier){
 		manaRechargeRate *= multiplier;
 	}
+
+    //returns the players spell multipliers
+    public playerMultipliers getPlayerMultipliers() {
+        return spellMultipliers;
+    }
+}
+
+//holds player stats that are applied to spells cast
+[System.Serializable]
+public struct playerMultipliers {
+    public float powerMultiplier; //how much to multiply spell power by (base 1x)
+    public float speedMultiplier; //how much to multiply spell speed by (base 1x)
+    public float accuracy; //how much to add to spell accuracy (base 0)
+    public float impactMultiplier; //how much to multiply spell impact by (base 1x)
+    public float critChance; //how much to add to spell crit chance (base 0)
+    public float critPower; //how much to add to spell crit power (base 0)
+    public float manaCostMultiplier; //how much to multiply spell mana cost by (base 1x)
+    public float coolDownMultiplier; //how much to multiply spell cooldown by (base 1x)
 }

@@ -60,41 +60,15 @@ public class SpellCraftMenu : MonoBehaviour {
         ResetSpell();
     }
 
-    //Loads the currently equipped spell into the crafting interface
-    public void LoadSpell(Spell equippedSpell) {
-
-        if (equippedSpell.icon != null) iconPicked = true;
-
-        //Setting base and form icons in the crafting UI
-        spell = equippedSpell;
-        SetBase(equippedSpell.spellBase, false);
-        SetForm(equippedSpell.spellForm, hexes[spell.spellBase].formID, false);
-
-        //Loading spell variables into the spell being crafted
-        spell = equippedSpell;
-        spell.spellEffects = (int[])equippedSpell.spellEffects.Clone();
-        spell.spellAugments = (int[])equippedSpell.spellAugments.Clone();
-        spell.spellKinetics = (int[])equippedSpell.spellKinetics.Clone();
-
-        //Setting crafting UI elements to those of the spell loaded
-        for (int i = 0; i < 3; i++) {
-            if (spell.spellEffects[i] != -1) SetEffect(spell.spellEffects[i], hexes[spell.spellBase].effectIDs[i]);
-            if (spell.spellKinetics[i] != -1) SetKinetic(spell.spellKinetics[i], hexes[spell.spellBase].kineticIDs[i]);
-            if (spell.spellAugments[i] != -1) SetAugment(spell.spellAugments[i], hexes[spell.spellBase].augmentIDs[i]);
-        }
-
-        if (spell.icon != null) displayIcon.sprite = spell.icon;
-        CalculateSpellStats();
-    }
-
     //Loads the spell of the specified spell slot
     public void LoadSpell(int spellSlot) {
+        ResetSpell();
         Debug.Log("Loading spell: " + spellSlot);
 
         currentSpellSlot = spellSlot;
         Spell equippedSpell = spellSlots[spellSlot].getSpell();
 
-        if (equippedSpell.icon != null) iconPicked = true;
+        if (equippedSpell.icon != blankIcon) iconPicked = true;
 
         //Setting base and form icons in the crafting UI
         spell = equippedSpell;

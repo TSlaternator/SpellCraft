@@ -24,6 +24,7 @@ public class SpellController : MonoBehaviour {
 	private bool meditating; //if the player is meditating or not ******************* MAYBE MOVE THIS TO STAT CONTROLLER ***********************
 	private bool vengefulSpell; //if a spell is vengeful or not
 	private float vengefulModifier = 1f; //the modifier of vengefuls spells (NEED TO RE DO THIS)
+    private playerMultipliers spellMultipliers; //spell multipliers attached to the player
 
 	//initialising variables
 	void Start(){
@@ -51,28 +52,19 @@ public class SpellController : MonoBehaviour {
 				if (Input.GetButtonDown ("KeyboardR")) {
 					meditating = true;
 					casting = false;
-				} else if (Input.GetMouseButtonDown (0)) {
-					casting = true;
-				} else if (Input.GetMouseButtonUp (0)) {
-					casting = false;
-				} else if (Input.GetButtonDown ("Keyboard1")) {
-					SwitchSpellSlot (0);
-				} else if (Input.GetButtonDown ("Keyboard2")) {
-					SwitchSpellSlot (1);
-				} else if (Input.GetButtonDown ("Keyboard3")) {
-					SwitchSpellSlot (2);
-				} else if (Input.GetButtonDown ("Keyboard4")) {
-					SwitchSpellSlot (3);
-				} else if (Input.GetButtonDown ("Keyboard5")) {
-					SwitchSpellSlot (4);
-				} else if (Input.GetButtonDown ("KeyboardQ")) {
-					PrevSpell ();
-				} else if (Input.GetButtonDown ("KeyboardE")) {
-					NextSpell ();
-				}
-				
+				} else if (Input.GetMouseButtonDown (0)) casting = true;
+				else if (Input.GetMouseButtonUp (0)) casting = false;
+				else if (Input.GetButtonDown ("Keyboard1")) SwitchSpellSlot (0);
+				else if (Input.GetButtonDown ("Keyboard2")) SwitchSpellSlot (1);
+				else if (Input.GetButtonDown ("Keyboard3")) SwitchSpellSlot (2);
+				else if (Input.GetButtonDown ("Keyboard4")) SwitchSpellSlot (3);
+				else if (Input.GetButtonDown ("Keyboard5")) SwitchSpellSlot (4);
+				else if (Input.GetButtonDown ("KeyboardQ")) PrevSpell ();
+				else if (Input.GetButtonDown ("KeyboardE")) NextSpell ();
+
                 //Casts a spell if the player is holding down the cast button, has enough mana, and their spell isnt on cooldown
-				if (casting && Time.time >= nextCast && playerStats.GetMana () >= currentSpell.manaCost && currentSpell.spellBase != 8) {
+                if (vengefulSpell) CalculateVengefulModifier();
+                if (casting && Time.time >= nextCast && playerStats.GetMana () >= getStat("manaCost") && currentSpell.spellBase != 8) {
 
                     //casts a spell of the correct spellForm
 					if (currentSpell.spellForm < 8) CastProjectile (GeneratePosition (1f, 0), GenerateSpread (1f), 1f, 0);
@@ -81,8 +73,8 @@ public class SpellController : MonoBehaviour {
 					else if (currentSpell.spellForm < 32) CastPulse ();
 
                     //Drain mana and reset cooldown
-                    playerStats.DrainMana (currentSpell.manaCost);
-					nextCast = Time.time + currentSpell.cooldown;
+                    playerStats.DrainMana (getStat("manaCost"));
+					nextCast = Time.time + getStat("cooldown");
 				} 
 			}
 		}
@@ -100,7 +92,10 @@ public class SpellController : MonoBehaviour {
         currentSpell.spellKinetics = (int[])spell.spellKinetics.Clone();
 
         if ((currentSpell.spellForm) % 8 == 7) vengefulSpell = true;
-		else vengefulSpell = false;
+        else {
+            vengefulSpell = false;
+            vengefulModifier = 1f;
+        }
 	}
 
     //Returns the currently cast spell
@@ -234,13 +229,28 @@ public class SpellController : MonoBehaviour {
 
 	//sets the stats of the spell
 	private void SetStats(ProjectileController pController, SpellEffectController sController){
-		if (vengefulSpell) vengefulModifier = 1f + 0.1f * MissingHealthModifier ();
-		else vengefulModifier = 1f;
+        if (vengefulSpell) CalculateVengefulModifier();
+        spellMultipliers = playerStats.getPlayerMultipliers();
 
-		pController.SetSpeed (currentSpell.speed * vengefulModifier);
-        sController.setStats(currentSpell.power * vengefulModifier, currentSpell.impact * vengefulModifier, currentSpell.critChance * vengefulModifier, 
-                                currentSpell.critMultiplier * vengefulModifier);
+		pController.SetSpeed (getStat("speed"));
+        sController.setStats(getStat("power"), getStat("accuracy"), getStat("crit%"), getStat("critPower"));
 	}
+
+    //helper method to get individual stats
+    private float getStat(string stat) {
+        switch (stat) {
+            case "power": return currentSpell.power * vengefulModifier * spellMultipliers.powerMultiplier;
+            case "speed": return currentSpell.speed * vengefulModifier * spellMultipliers.speedMultiplier;
+            case "impact": return currentSpell.impact * vengefulModifier * spellMultipliers.impactMultiplier;
+            case "crit%": return currentSpell.critChance + spellMultipliers.critChance;
+            case "critPower": return currentSpell.critMultiplier + spellMultipliers.critPower;
+            case "manaCost": return currentSpell.manaCost * (1 / vengefulModifier) * spellMultipliers.manaCostMultiplier;
+            case "cooldown": return currentSpell.cooldown * (1 / vengefulModifier) * spellMultipliers.coolDownMultiplier;
+            case "accuracy": if (currentSpell.accuracy + spellMultipliers.accuracy > 100) return 100f;
+                             else return currentSpell.accuracy + spellMultipliers.accuracy;
+            default: return 1f;
+        }
+    }
 
 	//generates a random offset for the spell
 	private Vector3 GeneratePosition(float innacuracyMultiplier, int castPoint){
@@ -260,7 +270,7 @@ public class SpellController : MonoBehaviour {
 
 	//generates the innacuracy spread of the projectile
 	private Vector3 GenerateSpread(float innacuracyMultiplier){
-		Vector3 rotation = new Vector3(0f, Random.Range(-(100 - currentSpell.accuracy), (100 - currentSpell.accuracy)) * innacuracyMultiplier, 0f);
+		Vector3 rotation = new Vector3(0f, Random.Range(-(100 - getStat("accuracy")), (100 - getStat("accuracy"))) * innacuracyMultiplier, 0f);
 		return rotation;
 	}
 
@@ -284,16 +294,13 @@ public class SpellController : MonoBehaviour {
     }
 
 	//used for Vengeful spells
-	private int MissingHealthModifier(){
+	private void CalculateVengefulModifier(){
 		float HP = playerStats.GetHealthPercent ();
-		int modifier;
 
-		if (HP <= 0.2f) modifier = 5;
-		else if (HP <= 0.4f) modifier = 4;
-		else if (HP <= 0.6f) modifier = 3;
-		else if (HP <= 0.8f) modifier = 2;
-		else modifier = 1;
-
-		return modifier;
+		if (HP <= 0.2f) vengefulModifier = 1.48f;
+		else if (HP <= 0.4f) vengefulModifier = 1.36f;
+		else if (HP <= 0.6f) vengefulModifier = 1.24f;
+		else if (HP <= 0.8f) vengefulModifier = 1.12f;
+		else vengefulModifier = 1f;
 	}
 }
