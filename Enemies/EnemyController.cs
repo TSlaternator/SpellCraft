@@ -110,7 +110,7 @@ public class EnemyController : MonoBehaviour {
 		animator.SetBool ("IsCasting", true);
 		yield return new WaitForSeconds (castAnimation.length / 2f);
 		spellController.Shoot ();
-		yield return new WaitForSeconds (castAnimation.length / 2f);
+		yield return new WaitForSeconds (castAnimation.length / 2f -0.1f);
 		animator.SetBool ("IsCasting", false);
 	}
 
