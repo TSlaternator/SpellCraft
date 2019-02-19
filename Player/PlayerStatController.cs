@@ -101,6 +101,36 @@ public class PlayerStatController : MonoBehaviour {
     public playerMultipliers getPlayerMultipliers() {
         return spellMultipliers;
     }
+
+    //buffs the player in some way
+    public void BuffPlayer(string stat, float buffAmount) {
+        switch (stat) {
+            case "power": spellMultipliers.powerMultiplier += buffAmount; break;
+            case "speed": spellMultipliers.speedMultiplier += buffAmount; break;
+            case "accuracy": spellMultipliers.accuracy += buffAmount; break;
+            case "impact": spellMultipliers.impactMultiplier += buffAmount; break;
+            case "manaCost": spellMultipliers.manaCostMultiplier += buffAmount; break;
+            case "cooldown": spellMultipliers.coolDownMultiplier += buffAmount; break;
+            case "critChance": spellMultipliers.critChance += buffAmount; break;
+            case "critPower": spellMultipliers.critPower += buffAmount; break;
+            case "maxHealth": AddMaxHealth(buffAmount); break;
+            case "maxMana": AddMaxMana(buffAmount); break;
+            case "health": Heal(buffAmount); break;
+            case "mana": AddMana(buffAmount); break;
+        }
+    }
+
+    //increases the players maximum health
+    public void AddMaxHealth(float amount) {
+        maxHealth += amount;
+        Heal(amount);
+    }
+
+    //increases the players maximum mana pool
+    public void AddMaxMana(float amount) {
+        maxMana += amount;
+        AddMana(amount);
+    }
 }
 
 //holds player stats that are applied to spells cast
