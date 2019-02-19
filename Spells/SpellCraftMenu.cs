@@ -282,11 +282,11 @@ public class SpellCraftMenu : MonoBehaviour {
         else if (spell.spellForm <= 23) powerSuffix = " x5";
         else powerSuffix = " x8";
 
-        spellText[0].text = spell.manaCost.ToString("N0");
-        spellText[1].text = spell.cooldown.ToString("N2");
-        spellText[2].text = spell.power.ToString("N0") + powerSuffix;
-        spellText[3].text = spell.accuracy.ToString("N0");
-        spellText[4].text = spell.speed.ToString("N0");
+        spellText[0].text = spell.manaCost.ToString("N0") + " Mana";
+        spellText[1].text = spell.cooldown.ToString("N2") + " s";
+        spellText[2].text = spell.power.ToString("N0") + " dmg" + powerSuffix;
+        spellText[3].text = spell.accuracy.ToString("N0") + "%";
+        spellText[4].text = spell.speed.ToString("N0") + " u/s";
         spellText[5].text = spell.impact.ToString("N0");
         spellText[6].text = (spell.critChance * 100).ToString("N0") + "%";
         spellText[7].text = (1 + spell.critMultiplier).ToString("N1") + "x";
