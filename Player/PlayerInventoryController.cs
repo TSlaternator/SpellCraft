@@ -9,6 +9,8 @@ public class PlayerInventoryController : MonoBehaviour {
 
 	[SerializeField] private float gold; //how much gold the player owns
 	[SerializeField] private Text goldText; //HUD value to display gold count
+    [SerializeField] private int keys; //how many keys the player has
+    [SerializeField] private Text keyText; //HUD value to display key count
     [SerializeField] private int inventorySize; //how many items to store!
     [SerializeField] private InventoryUIController UI; //UI of the inventory
     private Item[] equipment; //current equipment of the player
@@ -20,6 +22,7 @@ public class PlayerInventoryController : MonoBehaviour {
 	//initialises HUD element
 	void Start(){
 		goldText.text = "" + gold;
+        keyText.text = "" + keys;
         equipment = new Item[8];
 	}
 
@@ -97,5 +100,11 @@ public class PlayerInventoryController : MonoBehaviour {
         for (int i = 0; i < item.getStats().Length; i++) {
             playerStats.BuffPlayer(item.getStat(i).stat, item.getStat(i).modifier * multiplier);
         }
+    }
+
+    //adds a key to the players inventory
+    public void AddKey() {
+        keys++;
+        keyText.text = "" + keys;
     }
 }

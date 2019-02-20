@@ -15,6 +15,6 @@ public class INVENTORY_TESTER : MonoBehaviour
                 item.setInventoryController(inventory);
                 inventory.PickupItem(item);
             }
-        }
+        } 
     }
 }

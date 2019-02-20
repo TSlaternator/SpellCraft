@@ -40,10 +40,12 @@ public class EnemyProjectileController : MonoBehaviour {
 
 	//determines what the projectile does when it hits a trigger collider
 	void OnTriggerEnter(Collider col){
-		ObstructionController other = col.GetComponent<ObstructionController> ();
-		if (other.player) {
-			other.GetComponent<PlayerStatController> ().DealDamage (damage);
-		}
+        if (col.tag != "Item") {
+            ObstructionController other = col.GetComponent<ObstructionController>();
+            if (other.player) {
+                other.GetComponent<PlayerStatController>().DealDamage(damage);
+            }
+        }
 	}
 
 	//determines what the projectile does when it hits a physics collider

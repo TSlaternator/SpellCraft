@@ -24,6 +24,11 @@ public class RoomController : MonoBehaviour
     private BoxCollider roomBounds; //allows detection of the player entering or leaving the room
     private coordinates[] nodes; //nodes that can spawn an obstacle (table, pillar etc)
     private List<GameObject> minimapComponents = new List<GameObject>(); //minimap components of the room
+    [SerializeField] private lootPool commonLoot; //pool of common loot the room can drop when cleared
+    [SerializeField] private lootPool uncommonLoot; //pool of uncommon loot the room can drop when cleared 
+    [SerializeField] private lootPool rareLoot; //pool of rare loot the room can drop when cleared
+    [SerializeField] private GameObject key; //room can also drop keys upon completion
+    [SerializeField] private GameObject item; //empty loot gameObject that will be populated from the loot pools
 
     //spawns the physical room
     public void SpawnRoom() {
@@ -143,7 +148,6 @@ public class RoomController : MonoBehaviour
     public void SpawnWalls(GameObject[] walls) {
         Vector3 spawnPos;
         GameObject thisWall;
-        GameObject MMWall;
         Transform wallTexture;
         float firstCorner, secondCorner, wallSize;
         //north wall
@@ -467,6 +471,7 @@ public class RoomController : MonoBehaviour
 
     //drops rewards to players upon them clearing the room
     public void DropRewards() {
+        //dropping gold, mana and health
         if (threat >= 0.25f) {
             int goldToDrop = (int)(loot * 10);
             int manaToDrop = (int)(essence * 10);
@@ -475,6 +480,28 @@ public class RoomController : MonoBehaviour
             SpawnPickups(goldDrop, goldToDrop);
             SpawnPickups(manaDrop, manaToDrop);
             SpawnPickups(healthDrop, healthToDrop);
+        }
+
+        //chance to drop a key
+        if (Random.Range(0f, 1f) <= loot) {
+            Instantiate(key, new Vector3(xCentre + Random.Range(-1f, 1f), 0f, zCentre + Random.Range(-1f, 1f)), Quaternion.identity);
+        }
+
+        //chance to drop a comsumable
+        if (Random.Range(0f, 1f) <= loot) {
+            float poolChoice = Random.Range(0f, 1f);
+            ItemController itemController = Instantiate(item, new Vector3(xCentre + Random.Range(-1f, 1f), 0f, zCentre + Random.Range(-1f, 1f)), Quaternion.identity).GetComponent<ItemController>();
+            int lootChoice;
+            if (poolChoice <= commonLoot.frequency) {
+                lootChoice = Random.Range(0, commonLoot.itemPool.Length);
+                itemController.Initialise(commonLoot.itemPool[lootChoice]);
+            } else if (poolChoice <= uncommonLoot.frequency) {
+                lootChoice = Random.Range(0, uncommonLoot.itemPool.Length);
+                itemController.Initialise(uncommonLoot.itemPool[lootChoice]);
+            } else if (poolChoice <= rareLoot.frequency) {
+                lootChoice = Random.Range(0, rareLoot.itemPool.Length);
+                itemController.Initialise(rareLoot.itemPool[lootChoice]);
+            }
         }
     }
 
@@ -527,6 +554,14 @@ public class RoomController : MonoBehaviour
 
 [System.Serializable]
 public struct coordinates {
+    /* Struct to hold simple (x, z) coordinates */
     public float x; //x position of the coordinate
     public float z; //z position of the coordinate
+}
+
+[System.Serializable]
+public struct lootPool {
+    /* Struct to hold a pool of lootable items */
+    public float frequency; //chance of this loot pool being chosen
+    public Item[] itemPool; //items in the loot pool
 }

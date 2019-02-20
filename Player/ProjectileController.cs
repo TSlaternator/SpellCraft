@@ -75,35 +75,37 @@ public class ProjectileController : MonoBehaviour {
 
     //what the projectile does when hitting a trigger collider
     void OnTriggerEnter(Collider col) {
-        ObstructionController other = col.GetComponent<ObstructionController>();
-        if (other.enemy) {
-            other.GetComponent<EnemyStatController>().ApplyDamage(effectController.GetDamage(other.GetComponent<EnemyStatController>()), effectController.GetDamageType(), effectController.GetCrit(), false);
-            other.GetComponent<EnemyController>().ApplyImpact(effectController.GetImpact());
-            effectController.ApplyEffects(other);
-            if (chaining && chainingTargets > 0) {
-                guided = false;
-                targetFound = false;
-                effectController.ModifyDamage(0.67f);
-                if (FindOtherTarget(other.gameObject) == false)
-                    seeking = true;
-                else {
-                    DestroyThis();
+        if (col.tag != "Item") {
+            ObstructionController other = col.GetComponent<ObstructionController>();
+            if (other.enemy) {
+                other.GetComponent<EnemyStatController>().ApplyDamage(effectController.GetDamage(other.GetComponent<EnemyStatController>()), effectController.GetDamageType(), effectController.GetCrit(), false);
+                other.GetComponent<EnemyController>().ApplyImpact(effectController.GetImpact());
+                effectController.ApplyEffects(other);
+                if (chaining && chainingTargets > 0) {
+                    guided = false;
+                    targetFound = false;
+                    effectController.ModifyDamage(0.67f);
+                    if (FindOtherTarget(other.gameObject) == false)
+                        seeking = true;
+                    else {
+                        DestroyThis();
+                    }
                 }
             }
-        }
 
-        if (other.obstructing) {
-            if (piercing && pierceCount > 0 && other.piercable) {
-                if (chaining && chainingTargets > 0)
+            if (other.obstructing) {
+                if (piercing && pierceCount > 0 && other.piercable) {
+                    if (chaining && chainingTargets > 0)
+                        chainingTargets--;
+                    else {
+                        pierceCount--;
+                        seeking = false;
+                    }
+                } else if (chaining && chainingTargets > 0) {
                     chainingTargets--;
-                else {
-                    pierceCount--;
-                    seeking = false;
+                } else {
+                    DestroyThis();
                 }
-            } else if (chaining && chainingTargets > 0) {
-                chainingTargets--;
-            } else {
-                DestroyThis();
             }
         }
     }
