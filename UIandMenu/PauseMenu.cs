@@ -16,6 +16,7 @@ public class PauseMenu : MonoBehaviour {
     [SerializeField] private SpellController spellController; //reference to the spell controller script
     [SerializeField] private SpellCraftMenu spellCraftMenu; //reference to the spell craft menu script
     [SerializeField] private InventoryUIController inventoryController; //reference to the inventorycontroller script
+    [SerializeField] private GameObject ChestUI; //chest UI
 
 	//pauses (or unpauses) the game when ESCAPE is pressed
 	void Update () {
@@ -34,6 +35,7 @@ public class PauseMenu : MonoBehaviour {
 		pauseMenuUI.SetActive (false);
 		spellMenuUI.SetActive (false);
         inventoryUI.SetActive(false);
+        ChestUI.SetActive(false);
         inventoryController.CloseInventory();
 		hudUI.SetActive (true);
 		Time.timeScale = 1f;
@@ -46,6 +48,7 @@ public class PauseMenu : MonoBehaviour {
 		pauseMenuUI.SetActive (true);
 		hudUI.SetActive (false);
         inventoryUI.SetActive(false);
+        ChestUI.SetActive(false);
 		Time.timeScale = 0f;
 		isPaused = true;
 		Cursor.SetCursor (null, Vector2.zero, CursorMode.Auto);

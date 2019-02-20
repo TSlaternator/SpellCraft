@@ -550,6 +550,11 @@ public class RoomController : MonoBehaviour
             minimapComponents[i].SetActive(true);
         }
     }
+
+    //gets the loot value of the room
+    public int getLoot() {
+        return (int)(loot * 100);
+    }
 }
 
 [System.Serializable]
@@ -563,5 +568,6 @@ public struct coordinates {
 public struct lootPool {
     /* Struct to hold a pool of lootable items */
     public float frequency; //chance of this loot pool being chosen
+    public int value; //value of the loot pool (used to generate chest contents)
     public Item[] itemPool; //items in the loot pool
 }

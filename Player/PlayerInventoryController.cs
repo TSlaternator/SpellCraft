@@ -16,7 +16,7 @@ public class PlayerInventoryController : MonoBehaviour {
     private Item[] equipment; //current equipment of the player
     [SerializeField] private EquipmentSlotController[] equipmentSlots; //slots that hold the players equipment
     [SerializeField] private PlayerStatController playerStats; //reference to the players stat controller
-    private List<Item> items = new List<Item>(); //list of items currently in the inventory
+    [SerializeField] private List<Item> items = new List<Item>(); //list of items currently in the inventory
     private bool buffed = false; //whether the player if buffed or not
 
 	//initialises HUD element
@@ -32,8 +32,12 @@ public class PlayerInventoryController : MonoBehaviour {
         if (items.Count < inventorySize) {
             items.Add(item);
             UI.UpdateUI(items);
+            Debug.Log("Pickup Success");
             return true;
-        } else return false;
+        } else {
+            Debug.Log("Pickup Failed");
+            return false;
+        }
     }
 
     //remove an item from the inventory
@@ -106,5 +110,14 @@ public class PlayerInventoryController : MonoBehaviour {
     public void AddKey() {
         keys++;
         keyText.text = "" + keys;
+    }
+
+    //returns true if a key can be used
+    public bool UseKey() {
+        if (keys > 0) {
+            keys--;
+            keyText.text = "" + keys;
+            return true;
+        } else return false;
     }
 }

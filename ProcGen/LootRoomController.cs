@@ -21,7 +21,8 @@ public class LootRoomController : MonoBehaviour, IRoomTypeController {
         this.zCentre = zCentre;
         this.width = width;
         this.height = height;
-        Instantiate(generator.lootRoom.interactable, new Vector3(xCentre - 0.5f, 0f, zCentre - 0.5f), Quaternion.identity, transform);
+        GameObject chest = Instantiate(generator.lootRoom.interactable, new Vector3(xCentre - 0.5f, 0f, zCentre - 0.5f), Quaternion.identity, transform);
+        chest.GetComponent<ChestController>().setLoot(GetComponent<RoomController>().getLoot());
     }
 
     //controls what happens when the player enters the room

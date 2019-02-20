@@ -11,7 +11,6 @@ public class ItemController : MonoBehaviour
     // checks for player proximity and pickup button
     void Update() {
         if (playerInProximity && Input.GetKey(KeyCode.Space)) {
-            Debug.Log("Player trying to pick up item!");
             PlayerInventoryController inventory = GameObject.Find("Player").GetComponent<PlayerInventoryController>();
             item.setInventoryController(inventory);
             inventory.PickupItem(item);
