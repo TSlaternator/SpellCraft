@@ -13,6 +13,7 @@ public class PauseMenu : MonoBehaviour {
 	[SerializeField] private Texture2D cursorSprite; //custom cursor sprite used in the game
 	[SerializeField] private GameObject hudUI; //reference to the HUD UI
     [SerializeField] private GameObject inventoryUI; //reference to the inventory UI
+    [SerializeField] private GameObject shopUI; //reference to the shop UI
     [SerializeField] private SpellController spellController; //reference to the spell controller script
     [SerializeField] private SpellCraftMenu spellCraftMenu; //reference to the spell craft menu script
     [SerializeField] private InventoryUIController inventoryController; //reference to the inventorycontroller script
@@ -38,6 +39,7 @@ public class PauseMenu : MonoBehaviour {
         ChestUI.SetActive(false);
         inventoryController.CloseInventory();
 		hudUI.SetActive (true);
+        shopUI.SetActive(false);
 		Time.timeScale = 1f;
 		isPaused = false;
 		Cursor.SetCursor (cursorSprite, Vector2.zero, CursorMode.Auto);
@@ -49,6 +51,7 @@ public class PauseMenu : MonoBehaviour {
 		hudUI.SetActive (false);
         inventoryUI.SetActive(false);
         ChestUI.SetActive(false);
+        shopUI.SetActive(false);
 		Time.timeScale = 0f;
 		isPaused = true;
 		Cursor.SetCursor (null, Vector2.zero, CursorMode.Auto);

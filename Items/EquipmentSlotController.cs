@@ -8,16 +8,24 @@ public class EquipmentSlotController : MonoBehaviour, IPointerEnterHandler, IPoi
 {
 
     [SerializeField] private Item item = null; //the item in the equipment slot
+    [SerializeField] private Image background; //the background image of the equipment slot
+    [SerializeField] private Sprite usedSlot; //background sprite for when the slot is being used
     [SerializeField] private Image icon; //the sprite of the equipment slot
     [SerializeField] private Text itemDescription; //holds the description of the currently moused-over object
     [SerializeField] private Text[] itemStats; //holds the stats of the currently moused-over object
 
     //sets the equipment of the slot
     public Item setEquipment(Item newEquipment) {
-        Item unequippedItem = item;
-        item = newEquipment;
-        icon.sprite = item.getSprite();
-        return unequippedItem;
+        if (newEquipment.getName() == item.getName()) {
+            AlreadyEquippedItem();
+            return newEquipment;
+        } else {
+            background.sprite = usedSlot;
+            Item unequippedItem = item;
+            item = newEquipment;
+            icon.sprite = item.getSprite();
+            return unequippedItem;
+        }
     }
 
     //gets the equipment of the slot

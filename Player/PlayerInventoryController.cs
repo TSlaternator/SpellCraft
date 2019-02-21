@@ -7,7 +7,7 @@ public class PlayerInventoryController : MonoBehaviour {
 
 	/* Controls the players inventory */
 
-	[SerializeField] private float gold; //how much gold the player owns
+	[SerializeField] private int gold; //how much gold the player owns
 	[SerializeField] private Text goldText; //HUD value to display gold count
     [SerializeField] private int keys; //how many keys the player has
     [SerializeField] private Text keyText; //HUD value to display key count
@@ -32,12 +32,21 @@ public class PlayerInventoryController : MonoBehaviour {
         if (items.Count < inventorySize) {
             items.Add(item);
             UI.UpdateUI(items);
-            Debug.Log("Pickup Success");
             return true;
-        } else {
-            Debug.Log("Pickup Failed");
-            return false;
-        }
+        } else return false;
+    }
+
+    //tries to buy an item
+    //returns 0 if purchase is successful, 1 if the player has no room 
+    //and 2 if the player doesn't have enough money
+    public int BuyItem(Item item) {
+        if (items.Count < inventorySize && gold >= item.getBuyPrice()) {
+            gold -= (int)item.getBuyPrice();
+            items.Add(item);
+            UI.UpdateUI(items);
+            return 0;
+        } else if (items.Count == inventorySize) return 1;
+        else return 2;
     }
 
     //remove an item from the inventory
@@ -119,5 +128,11 @@ public class PlayerInventoryController : MonoBehaviour {
             keyText.text = "" + keys;
             return true;
         } else return false;
+    }
+
+    //gets the players gold count
+    public int getGold() {
+        Debug.Log("Getting player gold");
+        return gold;
     }
 }
