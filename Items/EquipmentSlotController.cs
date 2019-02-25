@@ -16,7 +16,7 @@ public class EquipmentSlotController : MonoBehaviour, IPointerEnterHandler, IPoi
 
     //sets the equipment of the slot
     public Item setEquipment(Item newEquipment) {
-        if (newEquipment.getName() == item.getName()) {
+        if (item != null && newEquipment.getName() == item.getName()) {
             AlreadyEquippedItem();
             return newEquipment;
         } else {

@@ -11,11 +11,11 @@ public class DoorController : MonoBehaviour {
 	private bool isOpen; //whether the door is open or not
     private bool isLocked; //whether the door is locked or not
     private int doorFacing; //which wall the door is on (used to determine open/close direction)
-    private Collider playerCollider;
+    private CapsuleCollider playerCollider;
 
     //get the players collider
     private void Start() {
-        playerCollider = GameObject.FindWithTag("Player").GetComponent<Collider>();
+        playerCollider = GameObject.FindWithTag("Player").GetComponent<CapsuleCollider>();
     }
 
     //controls what happens when something collides with the door

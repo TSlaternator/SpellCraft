@@ -19,8 +19,10 @@ public class ChestSlotController : MonoBehaviour
 
     //Removes the item from the item slot
     public void RemoveItem() {
-        item.setInventoryController(inventory);
-        if (inventory.PickupItem(item)) chest.RemoveItem(item);
+        if (item != null) {
+            item.setInventoryController(inventory);
+            if (inventory.PickupItem(item)) chest.RemoveItem(item);
+        }
     }
 
     //empties the slot

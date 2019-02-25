@@ -41,7 +41,7 @@ public class GenericRoomController : MonoBehaviour, IRoomTypeController {
             tileController = GameObject.Find("LevelManager").GetComponent<TileMapController>();
             tileController.RemoveFog(xCentre, zCentre, width, height);
             roomController = gameObject.GetComponent<RoomController>();
-            roomController.SpawnMobs(generator.genericRoom.mobs, generator.mobRoom.mobThreatValues, 0);
+            roomController.SpawnMobs(generator.genericRoom.mobs, generator.genericRoom.mobThreatValues, 0);
             enemies = GameObject.Find("EnemiesList").transform;
             roomController.LockDoors();
             GetComponent<RoomController>().AddToMiniMap();
