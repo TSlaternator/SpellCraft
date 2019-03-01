@@ -77,5 +77,6 @@ public class PauseMenu : MonoBehaviour {
     //Sets isPaused to true
     public void setPaused(bool paused) {
         isPaused = paused;
+        if (paused) hudUI.SetActive(false); 
     }
 }

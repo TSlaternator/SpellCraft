@@ -19,6 +19,8 @@ public class ChestController : MonoBehaviour
     private GameController gameController; //holds details of the chest UI
     private PlayerInventoryController inventory; //controls the players inventory
     private PauseMenu pauseMenu; //the pausemenu script
+    [SerializeField] private Animator animator; //the animator attached to the object
+    [SerializeField] private AnimationClip openAnimation; //used to get the time taken to open the chest
 
     void Start() {
         gameController = GameObject.Find("GameController").GetComponent<GameController>();
@@ -34,9 +36,15 @@ public class ChestController : MonoBehaviour
             if (!isOpen && inventory.UseKey()) {
                 Initialise();
                 isOpen = true;
-                OpenUI();
+                StartCoroutine(OpenAnimation());
             } else if (isOpen) OpenUI();
         }
+    }
+
+    private IEnumerator OpenAnimation() {
+        animator.SetBool("IsOpen", true);
+        yield return new WaitForSeconds(openAnimation.length * 1.5f);
+        OpenUI();
     }
 
     //sets this as the active chest for the UI controllers

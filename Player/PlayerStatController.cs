@@ -20,6 +20,8 @@ public class PlayerStatController : MonoBehaviour {
 	[SerializeField] private Text manaText; //reference to the mana text in the HUD
 	[SerializeField] private float manaRechargeRate; //how fast the players mana regenerates
     [SerializeField] private playerMultipliers spellMultipliers; //applied to any spell cast
+    [SerializeField] private GameObject buffUI; //UI element to show current buff icons
+    [SerializeField] private Image buffIcon; //icon to show current buff
 
 	//initialises stats
 	void Start(){
@@ -118,6 +120,12 @@ public class PlayerStatController : MonoBehaviour {
             case "health": Heal(buffAmount); break;
             case "mana": AddMana(buffAmount); break;
         }
+    }
+
+    //controls the buff icon UI element
+    public void setBuffIcon(Sprite icon, bool isActive) {
+        buffIcon.sprite = icon;
+        buffUI.SetActive(isActive);
     }
 
     //increases the players maximum health

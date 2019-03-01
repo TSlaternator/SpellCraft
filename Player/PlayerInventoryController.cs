@@ -102,9 +102,9 @@ public class PlayerInventoryController : MonoBehaviour {
     //buffs the player for the duration specified
     public IEnumerator Buff(Item item, float duration) {
         buffed = true;
-        ModifyStats(item, 1);
+        ModifyStats(item, 1, true);
         yield return new WaitForSeconds(duration);
-        ModifyStats(item, -1);
+        ModifyStats(item, -1, false);
         buffed = false;
     }
 
@@ -113,6 +113,14 @@ public class PlayerInventoryController : MonoBehaviour {
         for (int i = 0; i < item.getStats().Length; i++) {
             playerStats.BuffPlayer(item.getStat(i).stat, item.getStat(i).modifier * multiplier);
         }
+    }
+
+    //overloaded version to show a buff icon in the menu
+    public void ModifyStats(Item item, float multiplier, bool buffing) {
+        for (int i = 0; i < item.getStats().Length; i++) {
+            playerStats.BuffPlayer(item.getStat(i).stat, item.getStat(i).modifier * multiplier);
+        }
+        playerStats.setBuffIcon(item.getSprite(), buffing);
     }
 
     //adds a key to the players inventory

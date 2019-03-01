@@ -208,6 +208,7 @@ public class EnemyController : MonoBehaviour {
         moving = false;
         agent.SetDestination(transform.position);
         GetComponent<Collider>().enabled = false;
+        agent.enabled = false;
         if (sleeping) Wake();
     }
 }
