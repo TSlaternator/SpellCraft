@@ -101,3 +101,11 @@ public interface IEffectRune {
     void IncreasePotency();
 }
 
+public interface IScrollController {
+
+    /* Interface to control scrolls */
+
+    //what to do when the scroll is used
+    void OnCast();
+}
+

@@ -5,8 +5,9 @@ using UnityEngine.UI;
 
 public class SpellController : MonoBehaviour {
 
-	/* Controls the spells the player is casting */
+    /* Controls the spells the player is casting */
 
+    [SerializeField] private ItemQuickSlotController quickSlot; //holds quick slot items (scrolls, potions etc)
 	[SerializeField] private CameraShaker cam; //the cameraShaker object
 	[SerializeField] private PlayerStatController playerStats; //reference to the players stats
 	[SerializeField] private SpellSlotController[] spellSlots; //reference to the players spell slots
@@ -21,7 +22,6 @@ public class SpellController : MonoBehaviour {
 
 	private float nextCast; //next time a spell can be cast
 	private bool casting; //if the player is holding down the cast button
-	private bool meditating; //if the player is meditating or not ******************* MAYBE MOVE THIS TO STAT CONTROLLER ***********************
 	private bool vengefulSpell; //if a spell is vengeful or not
 	private float vengefulModifier = 1f; //the modifier of vengefuls spells (NEED TO RE DO THIS)
     private playerMultipliers spellMultipliers; //spell multipliers attached to the player
@@ -36,47 +36,33 @@ public class SpellController : MonoBehaviour {
 	void Update () {
 		if (!PauseMenu.isPaused) {
 
-			if (Input.GetButton ("KeyboardR")) {
-				if (!meditating) {
-					meditating = true; 
-					playerStats.SetManaRecharge (100f);
-				}
-			} else if (meditating) {
-				meditating = false;
-				playerStats.SetManaRecharge (0.01f);
-			}
+            //Getting user input
+            if (Input.GetButtonDown("KeyboardR")) quickSlot.UseItem();
+            else if (Input.GetMouseButtonDown(0)) casting = true;
+            else if (Input.GetMouseButtonUp(0)) casting = false;
+            else if (Input.GetButtonDown("Keyboard1")) SwitchSpellSlot(0);
+            else if (Input.GetButtonDown("Keyboard2")) SwitchSpellSlot(1);
+            else if (Input.GetButtonDown("Keyboard3")) SwitchSpellSlot(2);
+            else if (Input.GetButtonDown("Keyboard4")) SwitchSpellSlot(3);
+            else if (Input.GetButtonDown("Keyboard5")) SwitchSpellSlot(4);
+            else if (Input.GetButtonDown("KeyboardQ")) PrevSpell();
+            else if (Input.GetButtonDown("KeyboardE")) NextSpell();
 
-			if (!meditating) {
+            //Casts a spell if the player is holding down the cast button, has enough mana, and their spell isnt on cooldown
+            if (vengefulSpell) CalculateVengefulModifier();
+            if (casting && Time.time >= nextCast && playerStats.GetMana () >= getStat("manaCost") && currentSpell.spellBase != 8) {
 
-                //Getting user input
-				if (Input.GetButtonDown ("KeyboardR")) {
-					meditating = true;
-					casting = false;
-				} else if (Input.GetMouseButtonDown (0)) casting = true;
-				else if (Input.GetMouseButtonUp (0)) casting = false;
-				else if (Input.GetButtonDown ("Keyboard1")) SwitchSpellSlot (0);
-				else if (Input.GetButtonDown ("Keyboard2")) SwitchSpellSlot (1);
-				else if (Input.GetButtonDown ("Keyboard3")) SwitchSpellSlot (2);
-				else if (Input.GetButtonDown ("Keyboard4")) SwitchSpellSlot (3);
-				else if (Input.GetButtonDown ("Keyboard5")) SwitchSpellSlot (4);
-				else if (Input.GetButtonDown ("KeyboardQ")) PrevSpell ();
-				else if (Input.GetButtonDown ("KeyboardE")) NextSpell ();
+                //casts a spell of the correct spellForm
+				if (currentSpell.spellForm < 8) CastProjectile (GeneratePosition (1f, 0), GenerateSpread (1f), 1f, 0);
+				else if (currentSpell.spellForm < 16) CastBurst ();
+				else if (currentSpell.spellForm < 24) CastSpread ();
+			    else if (currentSpell.spellForm < 32) CastPulse ();
 
-                //Casts a spell if the player is holding down the cast button, has enough mana, and their spell isnt on cooldown
-                if (vengefulSpell) CalculateVengefulModifier();
-                if (casting && Time.time >= nextCast && playerStats.GetMana () >= getStat("manaCost") && currentSpell.spellBase != 8) {
-
-                    //casts a spell of the correct spellForm
-					if (currentSpell.spellForm < 8) CastProjectile (GeneratePosition (1f, 0), GenerateSpread (1f), 1f, 0);
-					else if (currentSpell.spellForm < 16) CastBurst ();
-					else if (currentSpell.spellForm < 24) CastSpread ();
-					else if (currentSpell.spellForm < 32) CastPulse ();
-
-                    //Drain mana and reset cooldown
-                    playerStats.DrainMana (getStat("manaCost"));
-					nextCast = Time.time + getStat("cooldown");
-				} 
-			}
+                //Drain mana and reset cooldown
+                playerStats.DrainMana (getStat("manaCost"));
+				nextCast = Time.time + getStat("cooldown");
+			} 
+			
 		}
 	}
 
@@ -281,11 +267,6 @@ public class SpellController : MonoBehaviour {
 		SetStats (projectileController, effectController);
 		ApplyKinetics (projectileController);
 		ApplyEffects (effectController);
-	}
-
-	//TODO CHANGE THIS SO ITS IN THE STAT CONTROLLER
-	public bool GetMeditating(){
-		return meditating;
 	}
 
     //returns the current active spell slot

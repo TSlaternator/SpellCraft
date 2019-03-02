@@ -12,6 +12,7 @@ public class ItemSlotController : MonoBehaviour, IPointerEnterHandler, IPointerE
     [SerializeField] private PlayerInventoryController inventory; //link to the inventory
     [SerializeField] private Text itemDescription; //description UI object
     [SerializeField] private Text[] itemStats; //stats UI objects
+    [SerializeField] private ItemQuickSlotController quickSlot; //allows players to use items with a hotkey in game
     private Item item; //the item in the slot
 
     //Adds an item to the icon slot
@@ -24,7 +25,7 @@ public class ItemSlotController : MonoBehaviour, IPointerEnterHandler, IPointerE
     //Uses the current item (if applicable)
     public void UseItem() {
         if (item != null) {
-            item.OnUse();
+            item.OnUse(quickSlot);
             ResetDescription();
         }
     }

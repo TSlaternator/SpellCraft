@@ -26,25 +26,19 @@ public class PlayerController : MonoBehaviour {
 
 	//determines the players movement and rotation
 	void Update () {
-		if (!spellController.GetMeditating ()) {
-			moveInput = new Vector3 (Input.GetAxisRaw ("Horizontal"), 0f, Input.GetAxisRaw ("Vertical"));
-			moveVelocity = moveInput * moveSpeed;
+		moveInput = new Vector3 (Input.GetAxisRaw ("Horizontal"), 0f, Input.GetAxisRaw ("Vertical"));
+		moveVelocity = moveInput * moveSpeed;
 
+		Ray ray = cam.ScreenPointToRay (Input.mousePosition);
+		Plane playerPlane = new Plane (Vector3.up, transform.position);
+		float rayLength; 
 
-			Ray ray = cam.ScreenPointToRay (Input.mousePosition);
-			Plane playerPlane = new Plane (Vector3.up, transform.position);
-			float rayLength; 
-
-			if (!PauseMenu.isPaused) {
-				if (playerPlane.Raycast (ray, out rayLength)) {
-					Vector3 lookPoint = ray.GetPoint (rayLength);
-					mouseOffset = new Vector3 (lookPoint.x - transform.position.x, 0f, lookPoint.z - transform.position.z);
-					transform.LookAt (new Vector3 (lookPoint.x, transform.position.y, lookPoint.z));
-				} 
-			}
-		} else {
-			moveInput = new Vector3 (0f, 0f, 0f);
-			moveVelocity = moveInput * moveSpeed;
+		if (!PauseMenu.isPaused) {
+			if (playerPlane.Raycast (ray, out rayLength)) {
+				Vector3 lookPoint = ray.GetPoint (rayLength);
+				mouseOffset = new Vector3 (lookPoint.x - transform.position.x, 0f, lookPoint.z - transform.position.z);
+				transform.LookAt (new Vector3 (lookPoint.x, transform.position.y, lookPoint.z));
+			} 
 		}
 	}
 

@@ -15,6 +15,7 @@ public class Item : ScriptableObject
     [SerializeField] private float duration; //duration of this consumable's buff (if applicable)
     [SerializeField] private PlayerInventoryController inventory; //used when the item is consumed
     [SerializeField] private string description; //description of the item
+    [SerializeField] private int scrollID = -1; //which scroll this is (if applicable)
 
     //sets the inventory controller up
     public void setInventoryController(PlayerInventoryController controller) {
@@ -27,13 +28,13 @@ public class Item : ScriptableObject
     }
 
     //what to do when the item is used in the inventory
-    public void OnUse() {
+    public void OnUse(ItemQuickSlotController quickSlot) {
         if (type == "equippable") inventory.EquipItem(this);
         else if (type == "persistentConsumable") {
             inventory.ConsumeItem(this);
             inventory.RemoveItem(this);
         } else if (type == "consumable") {
-            if (inventory.ConsumeItem(this, duration)) inventory.RemoveItem(this);
+            quickSlot.AddItem(this);
         }
     }
 
@@ -80,6 +81,16 @@ public class Item : ScriptableObject
     //gets a specific stat
     public Stat getStat(int stat) {
         return stats[stat];
+    }
+    
+    //gets the duration of the item
+    public float getDuration() {
+        return duration;
+    }
+
+    //gets the scrollID of the item
+    public int getScrollID() {
+        return scrollID;
     }
 }
 

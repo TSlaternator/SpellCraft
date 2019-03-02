@@ -21,13 +21,8 @@ public class PlayerMoveController : MonoBehaviour {
 
 	//determines the players movement and rotation
 	void Update () {
-		if (!spellController.GetMeditating ()) {
-			moveInput = new Vector3 (Input.GetAxisRaw ("Horizontal"), 0f, Input.GetAxisRaw ("Vertical"));
-			moveVelocity = moveInput * moveSpeed;
-		} else {
-			moveInput = new Vector3 (0f, 0f, 0f);
-			moveVelocity = moveInput * moveSpeed;
-		}
+		moveInput = new Vector3 (Input.GetAxisRaw ("Horizontal"), 0f, Input.GetAxisRaw ("Vertical"));
+		moveVelocity = moveInput * moveSpeed;
 		animator.SetFloat ("Speed", moveVelocity.magnitude);
 	}
 

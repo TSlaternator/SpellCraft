@@ -42,6 +42,7 @@ public class PlayerInventoryController : MonoBehaviour {
     public int BuyItem(Item item) {
         if (items.Count < inventorySize && gold >= item.getBuyPrice()) {
             gold -= (int)item.getBuyPrice();
+            goldText.text = "" + gold;
             items.Add(item);
             UI.UpdateUI(items);
             return 0;
