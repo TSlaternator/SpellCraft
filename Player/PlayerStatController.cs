@@ -12,7 +12,7 @@ public class PlayerStatController : MonoBehaviour {
 	private float healthPercentage; //current health percentage of the player
 	[SerializeField] private Image healthBar; //reference to the players health bar
 	[SerializeField] private Text healthText; //reference to the health text in the HUD
-
+    [SerializeField] private PlayerMoveController moveController; //used to edit speed stat
 	[SerializeField] float maxMana; //maximum mana of the player
 	private float mana; //current mana of the player 
 	private float manaPercentage; //current mana percentage of the player
@@ -22,12 +22,15 @@ public class PlayerStatController : MonoBehaviour {
     [SerializeField] private playerMultipliers spellMultipliers; //applied to any spell cast
     [SerializeField] private GameObject buffUI; //UI element to show current buff icons
     [SerializeField] private Image buffIcon; //icon to show current buff
+    [SerializeField] private float speed; //how fast the player moves
+    [SerializeField] private float luck; //effects loot pools, room drops etc
+    [SerializeField] private PlayerInventoryController inventory; //the players inventory
 
 	//initialises stats
 	void Start(){
 		health = maxHealth;
 		mana = maxMana;
-        
+        speed = moveController.getSpeed();
 	}
 
 	//updates current stat percentages and bars, regenerates mana 
@@ -119,7 +122,21 @@ public class PlayerStatController : MonoBehaviour {
             case "maxMana": AddMaxMana(buffAmount); break;
             case "health": Heal(buffAmount); break;
             case "mana": AddMana(buffAmount); break;
+            case "luck": luck += buffAmount; break;
+            case "moveSpeed": AddSpeed(buffAmount); break;
+            case "gold": inventory.AddGold((int)buffAmount); break;
         }
+    }
+
+    //used the check that the player has enough, before they sacrifice to a shrine
+    public float getStat(string stat) {
+        switch (stat) {
+            case "maxHealth": return maxHealth;
+            case "maxMana": return maxMana;
+            case "health": return health;
+            case "gold": return inventory.getGold();
+        }
+        return -1f;
     }
 
     //controls the buff icon UI element
@@ -131,13 +148,25 @@ public class PlayerStatController : MonoBehaviour {
     //increases the players maximum health
     public void AddMaxHealth(float amount) {
         maxHealth += amount;
-        Heal(amount);
+        if (amount > 0) Heal(amount);
+        else if (health > maxHealth) health = maxHealth;
     }
 
     //increases the players maximum mana pool
     public void AddMaxMana(float amount) {
         maxMana += amount;
         AddMana(amount);
+    }
+
+    //increases the players movement speed
+    public void AddSpeed(float amount) {
+        speed += amount;
+        moveController.setSpeed(speed);
+    }
+
+    //gets the players luck
+    public float getLuck() {
+        return luck;
     }
 }
 

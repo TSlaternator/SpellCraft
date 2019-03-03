@@ -18,6 +18,8 @@ public class PauseMenu : MonoBehaviour {
     [SerializeField] private SpellCraftMenu spellCraftMenu; //reference to the spell craft menu script
     [SerializeField] private InventoryUIController inventoryController; //reference to the inventorycontroller script
     [SerializeField] private GameObject ChestUI; //chest UI
+    [SerializeField] private GameObject ShrineUI; //the shrine UI Object
+    [SerializeField] private ShrineUIController shrineUIController; //controls the shrine UI
 
 	//pauses (or unpauses) the game when ESCAPE is pressed
 	void Update () {
@@ -40,6 +42,7 @@ public class PauseMenu : MonoBehaviour {
         inventoryController.CloseInventory();
 		hudUI.SetActive (true);
         shopUI.SetActive(false);
+        ShrineUI.SetActive(false);
 		Time.timeScale = 1f;
 		isPaused = false;
 		Cursor.SetCursor (cursorSprite, Vector2.zero, CursorMode.Auto);
@@ -52,14 +55,19 @@ public class PauseMenu : MonoBehaviour {
         inventoryUI.SetActive(false);
         ChestUI.SetActive(false);
         shopUI.SetActive(false);
-		Time.timeScale = 0f;
+        ShrineUI.SetActive(false);
+        Time.timeScale = 0f;
 		isPaused = true;
 		Cursor.SetCursor (null, Vector2.zero, CursorMode.Auto);
 	}
 
 	//opens the spell crafting menu
 	public void SpellMenu(){
-		spellMenuUI.SetActive (true);
+        hudUI.SetActive(false);
+        Time.timeScale = 0f;
+        isPaused = true;
+        Cursor.SetCursor(null, Vector2.zero, CursorMode.Auto);
+        spellMenuUI.SetActive (true);
         spellCraftMenu.LoadSpell(spellController.getSpellSlot());
 		pauseMenuUI.SetActive (false);
 	}
@@ -77,6 +85,6 @@ public class PauseMenu : MonoBehaviour {
     //Sets isPaused to true
     public void setPaused(bool paused) {
         isPaused = paused;
-        if (paused) hudUI.SetActive(false); 
+        if (paused) hudUI.SetActive(false);
     }
 }

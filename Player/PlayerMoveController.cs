@@ -31,4 +31,14 @@ public class PlayerMoveController : MonoBehaviour {
 		body.velocity = moveVelocity;
         if (transform.position.y != 0.5f) transform.position = new Vector3(transform.position.x, 0.5f, transform.position.z);
 	}
+
+    //sets the players speed to the amount supplied
+    public void setSpeed(float newSpeed) {
+        moveSpeed = newSpeed;
+    }
+
+    //gets the players moveSpeed
+    public float getSpeed() {
+        return moveSpeed;
+    }
 }

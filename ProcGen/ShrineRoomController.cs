@@ -7,6 +7,7 @@ public class ShrineRoomController : MonoBehaviour, IRoomTypeController {
 
     private LevelGenerator generator; //the level generator script
     private TileMapController tileController; //the tile map controller script
+    private RoomController roomController; //room controller of the room
     private bool explored = false; //will turn true once the room has been entered
     private float xCentre, zCentre; //center of the room
     private int width, height; //dimensions of the room
@@ -31,6 +32,8 @@ public class ShrineRoomController : MonoBehaviour, IRoomTypeController {
             explored = true;
             tileController = GameObject.Find("LevelManager").GetComponent<TileMapController>();
             tileController.RemoveFog(xCentre, zCentre, width, height);
+            roomController = gameObject.GetComponent<RoomController>();
+            roomController.SpawnPassiveMobs(generator.shrineRoom.mobs[0]);
             GetComponent<RoomController>().AddToMiniMap();
         }
     }

@@ -18,6 +18,8 @@ public class GameController : MonoBehaviour {
     [SerializeField] private string[] shopKeeperInadequateFundsQuotes; //messages for when the player tries to buy something they can't afford
     [SerializeField] private string[] shopKeeperBagFullQuotes; //messages for when the player tries to buy something, with a full bag
     [SerializeField] private Text playerMoneyText; //displays the players money in the shop UI
+    [SerializeField] private Shrine[] shrineTypes; //holds the types of shrine that can appear in the game
+    [SerializeField] private GameObject shrineUI; //holds the UI for shrines
 
     //sets the cursor to the custom one
 	void Start () {
@@ -73,4 +75,13 @@ public class GameController : MonoBehaviour {
         return playerMoneyText;
     }
 
+    //gets a type for a shrine
+    public Shrine getShrineType() {
+        return (shrineTypes[Random.Range(0, shrineTypes.Length)]);
+    }
+
+    //gets the shrineUI
+    public GameObject getShrineUI() {
+        return shrineUI;
+    }
 }

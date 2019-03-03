@@ -144,4 +144,9 @@ public class PlayerInventoryController : MonoBehaviour {
         Debug.Log("Getting player gold");
         return gold;
     }
+
+    //adds gold to the player
+    public void AddGold(int amount) {
+        gold += amount;
+    }
 }

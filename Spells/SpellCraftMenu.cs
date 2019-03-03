@@ -46,10 +46,6 @@ public class SpellCraftMenu : MonoBehaviour {
 		if (iconPicked) {
 			CalculateSpellStats ();
             spellSlots[currentSpellSlot].setSpell(spell);
-            /*
-			spellController.Cast (spell);
-			pauseMenu.Resume ();
-			ResetSpell (); */
 		} else toolTipText.text = "Please pick an Icon first";
 	}
 

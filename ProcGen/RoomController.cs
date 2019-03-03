@@ -460,6 +460,33 @@ public class RoomController : MonoBehaviour
         }
     }
 
+    //spawns a number of passive mobs based on the size of the room
+    public void SpawnPassiveMobs(GameObject mob) {
+        int mobsToSpawn; //how many mobs to spawn
+        mobsToSpawn = (width * height) / 25;
+        for(int i = 0; i < mobsToSpawn; i++) {
+            SpawnPassiveMob(mob);
+        }
+    }
+
+    //spawns the mob somewhere random (but pathable) within the room
+    public void SpawnPassiveMob(GameObject mob) {
+        bool spawned = false; //will repeat until true!
+        float xPos, zPos; //positions to spawn at
+        Vector3 spawnPoint; //point to spawn the mob at
+        NavMeshHit hit; //navmesh hit data (used for debugging)
+        while (!spawned) {
+            xPos = Random.Range(xCentre - width / 2, xCentre + width / 2);
+            zPos = Random.Range(zCentre - height / 2, zCentre + height / 2);
+            spawnPoint = new Vector3(xPos, 0f, zPos);
+            if (NavMesh.SamplePosition(spawnPoint, out hit, 0.1f, NavMesh.AllAreas)) {
+                GameObject thisMob = Instantiate(mob, spawnPoint, Quaternion.identity, this.transform);
+                thisMob.GetComponent<PassiveAIController>().InitialiseAgent(xCentre, zCentre, width, height);
+                spawned = true;
+            }
+        }
+    }
+
     //Gets the lowest value in the array
     public int getMin(int[] values) {
         int answer = 100;
