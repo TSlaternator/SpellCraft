@@ -41,4 +41,9 @@ public class PlayerMoveController : MonoBehaviour {
     public float getSpeed() {
         return moveSpeed;
     }
+
+    //gets where the player will be if they keep moving in the same direction
+    public Vector3 getFuturePosition() {
+        return transform.position + body.velocity / 2;
+    }
 }

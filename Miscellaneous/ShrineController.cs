@@ -54,6 +54,7 @@ public class ShrineController : MonoBehaviour
     //gets a type for the shrine
     private void InitialiseShrine() {
         details = gameController.getShrineType();
+        details.activeChoice = Random.Range(0, details.choices.Length);
     }
 
     //called when a sacrifice is made, the shrine becomes inactive

@@ -109,3 +109,25 @@ public interface IScrollController {
     void OnCast();
 }
 
+public interface IEnemyMoveController {
+
+    /* Controls enemy movement when in range of the player */
+
+    //gets a destination for the enemy
+    Vector3 getDestination(Vector3 currentPosition, Vector3 playerPosition, float range);
+}
+
+public interface IEnemyAvoidanceController {
+
+    /* Controls enemy avoidance when hit by a projectile */
+
+    //what to do when the enemy is hit
+    void OnHit();
+
+    //returns the chance to use avoidance
+    float AvoidanceChance();
+
+    //returns true if currently avoiding
+    bool IsAvoiding();
+}
+

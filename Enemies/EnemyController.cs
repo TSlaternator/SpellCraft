@@ -1,4 +1,4 @@
-﻿using System.Collections;
+﻿ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.AI;
@@ -8,12 +8,14 @@ public class EnemyController : MonoBehaviour {
 
     /* Controls enemy agents and their actions */
 
-    [SerializeField] private Transform castPoint;
+    [SerializeField] private IEnemyAvoidanceController avoidanceController; //controls avoidance mechanic
+    [SerializeField] private IEnemyMoveController moveController; //controls movement mechanics
+    [SerializeField] private IEnemySpellController spellController; //controls casting
+    [SerializeField] private Transform castPoint; //cast point of the enemy
 	[SerializeField] private float fireRate; // the fireRate of the enmy
 	[SerializeField] private float range; //the range the enemy can fire to
 	[SerializeField] private float staggerResist; //how resistant the enemy is to  staggering
 	[SerializeField] private NavMeshAgent agent; //controls movement
-	[SerializeField] private IEnemySpellController spellController; //controls casting
 	[SerializeField] private Transform textList; //clearnup list to spawn the text under
 	[SerializeField] private Transform floatingDebuffPosition; //spawn point of the floating debuffIcon
 	[SerializeField] private GameObject debuffIcon; //the debuffIcon canvas spawned to show debuffs
@@ -22,33 +24,36 @@ public class EnemyController : MonoBehaviour {
 	private GameObject debuff; //the debuff gameObject (used to call methods)
 	private Transform gameController; //transform always facing forwards (used to spawn damage text)
 	private GameObject player; //the player
+    private PlayerMoveController playerMovement; //the movement controller of the player
 	private float nextFire; //next time the agent can fire
 	private bool knockback; //whether the agent is being knocked back
 	private Vector3 knockbackDirection; //direction of the knockback
 	private float knockbackDuration; //duration of the knockback
 	private bool snared; //whether the agent is snared
-	private float snareDuration; //the duration of the snare
 	[SerializeField] private Sprite snareIcon; //the icon of the snare debuff
 	private bool sleeping; //whether the agent is asleep
 	[SerializeField] private Sprite sleepIcon; //the sleep debuff icon
 	private DebuffIconController currentSleepIcon; //used to Destroy() the icon when the agent wakes
 	private bool wakeable; //if the agent is wakeable or not
 	private bool stunned; //if the agent is stunned
-	private float stunDuration; //the duration of the stun
 	[SerializeField] private Sprite stunIcon; //the icon of the stun debuff
 	private bool slowed; //whether the agent is slowed
-	private float slowDuration; //the duration of the slow debuff
 	[SerializeField] private Sprite slowIcon; //the slow debuff icon
 	private bool moving; //whether the sprite is moving
-	[SerializeField] private AnimationClip castAnimation;
-	public bool isDead;
+	[SerializeField] private AnimationClip castAnimation; //the cast animation of the enemy
+	public bool isDead; //whether the enemy is dead or not
+    private Vector3 destination; //where the enemy is going
+    [SerializeField] private bool predictive; //whether the enemy predicts the players movement or not
 
 	//initialising varibles
 	void Start () {
 		player = GameObject.FindGameObjectWithTag ("Player");
-		spellController = gameObject.GetComponent<IEnemySpellController> ();
-		nextFire = Time.time;
+		spellController = GetComponent<IEnemySpellController> ();
+        moveController = GetComponent<IEnemyMoveController>();
+        avoidanceController = GetComponent<IEnemyAvoidanceController>();
+		nextFire = Time.time + 3f; //small delay before firing so they don't shoot the second the player enters the room
 		gameController = GameObject.Find ("GameController").transform;
+        playerMovement = player.GetComponent<PlayerMoveController>();
 	}
 
 	// controls debuffs and when they end, as well as the agents FSM
@@ -56,39 +61,22 @@ public class EnemyController : MonoBehaviour {
 		if (!isDead) {
 			moving = false;
 
-			if (snared && Time.time > snareDuration) {
-				snared = false;
-			}
-
-			if (stunned && Time.time > stunDuration) {
-				stunned = false;
-			}
-
-			if (slowed && Time.time > slowDuration) {
-				slowed = false;
-				fireRate /= 1.5f;
-				agent.speed *= 2f;
-				agent.angularSpeed *= 2f;
-			}
-
 			if (!sleeping && !stunned) {
 				if (knockback) {
 					nextFire += Time.deltaTime;
 				} else if (snared) {
 					agent.SetDestination (transform.position);
-					if (Vector3.Magnitude (player.transform.position - transform.position) < range && LineOfSight())
-						Cast ();
-				} else {
-					if (Vector3.Magnitude (player.transform.position - transform.position) < range && LineOfSight()) {
+					if (Vector3.Magnitude (getPlayerPosition() - transform.position) < range && LineOfSight()) Cast ();
+				} else if (!avoidanceController.IsAvoiding()) {
+					if (Vector3.Magnitude (getPlayerPosition() - transform.position) < range && LineOfSight()) {
                         agent.SetDestination(transform.position);
                         Cast();
 					} else {
-                        agent.SetDestination(player.transform.position);
+                        agent.SetDestination(moveController.getDestination(transform.position, player.transform.position, range)); 
                         moving = true;
                     }
 				}
-
-				transform.LookAt (player.transform.position);
+				transform.LookAt (getPlayerPosition());
 			} else {
 				nextFire += Time.deltaTime;
 			}
@@ -130,14 +118,21 @@ public class EnemyController : MonoBehaviour {
 
 	//snares the agent, preventing it from moving
 	public void ApplySnare(){
-		debuff = Instantiate (debuffIcon, floatingDebuffPosition.position, gameController.rotation, textList);
+        StopCoroutine(SnareEffect(5f));
+        debuff = Instantiate (debuffIcon, floatingDebuffPosition.position, gameController.rotation, textList);
 		currentDebuff = debuff.GetComponent<DebuffIconController> ();
 		currentDebuff.SetLifetime (5f);
 		currentDebuff.SetSprite (snareIcon);
 		currentDebuff.SetLocation (floatingDebuffPosition);
-		snared = true;
-		snareDuration = Time.time + 5f;
+        StartCoroutine(SnareEffect(5f));
 	}
+
+    //snares the enemy
+    private IEnumerator SnareEffect(float duration) {
+        snared = true;
+        yield return new WaitForSeconds(duration);
+        snared = false;
+    }
 
 	//puts the agent to sleep, preventing it from doing anything
 	public void ApplySleep(){
@@ -167,35 +162,52 @@ public class EnemyController : MonoBehaviour {
 
 	//applies a stun to the agent, preventing it from doing anything
 	public void ApplyStun(){
-		debuff = Instantiate (debuffIcon, floatingDebuffPosition.position, gameController.rotation, textList);
+        StopCoroutine(StunEffect(3f));
+        debuff = Instantiate (debuffIcon, floatingDebuffPosition.position, gameController.rotation, textList);
 		currentDebuff = debuff.GetComponent<DebuffIconController> ();
 		currentDebuff.SetLifetime (3f);
 		currentDebuff.SetSprite (stunIcon);
 		currentDebuff.SetLocation (floatingDebuffPosition);
-		stunned = true;
-		stunDuration = Time.time + 3f;
+        StartCoroutine(StunEffect(3f));
 	}
+
+    //stuns the enemy
+    private IEnumerator StunEffect(float duration) {
+        stunned = true;
+        yield return new WaitForSeconds(duration);
+        stunned = false;
+    }
 
 	//applies a slow to the agent, slowing its movement and fire rate
 	public void ApplySlow(){
+        StopCoroutine(SlowEffect(5f));
 		debuff = Instantiate (debuffIcon, floatingDebuffPosition.position, gameController.rotation, textList);
 		currentDebuff = debuff.GetComponent<DebuffIconController> ();
 		currentDebuff.SetLifetime (5f);
 		currentDebuff.SetSprite (slowIcon);
 		currentDebuff.SetLocation (floatingDebuffPosition);
-		slowed = true;
-		slowDuration = Time.time + 5f;
-		fireRate *= 1.5f;
-		agent.speed /= 2f;
-		agent.angularSpeed /= 2f;
+        StartCoroutine(SlowEffect(5f));
 	}
+
+    //slows the enemy
+    private IEnumerator SlowEffect(float duration) {
+        slowed = true;
+        fireRate *= 1.5f;
+        agent.speed /= 2f;
+        agent.angularSpeed /= 2f;
+        yield return new WaitForSeconds(duration);
+        slowed = false;
+        fireRate /= 1.5f;
+        agent.speed *= 2f;
+        agent.angularSpeed *= 2f;
+    }
 
     //returns true if the enemy can see the player, false if not
     public bool LineOfSight() {
         bool LOS = false;
         RaycastHit hit;
 
-        if (Physics.Raycast(castPoint.position, player.transform.position - castPoint.position, out hit, range)) {
+        if (Physics.Raycast(castPoint.position, getPlayerPosition() - castPoint.position, out hit, range)) {
             if (hit.collider.gameObject.tag == "Player") LOS = true;
         }
 
@@ -210,5 +222,11 @@ public class EnemyController : MonoBehaviour {
         GetComponent<Collider>().enabled = false;
         agent.enabled = false;
         if (sleeping) Wake();
+    }
+
+    //gets the players position, or future position
+    private Vector3 getPlayerPosition() {
+        if (predictive) return playerMovement.getFuturePosition();
+        else return player.transform.position;
     }
 }

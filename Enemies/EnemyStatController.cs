@@ -4,9 +4,10 @@ using UnityEngine;
 
 public class EnemyStatController : MonoBehaviour {
 
-	/* Controls enemy stats and any effects that interact with the enemies stats
+    /* Controls enemy stats and any effects that interact with the enemies stats
 	 * such as damage, debuffs etc */
 
+    [SerializeField] private IEnemyAvoidanceController avoidanceController; //controls enemy avoidance
 	[SerializeField] private float maxHP; //maximum HP of the enemy
 	[SerializeField] private float fireResistance; //fire resistance of the enemy
 	[SerializeField] private float waterResistance; //water resistance of the enemy
@@ -24,37 +25,23 @@ public class EnemyStatController : MonoBehaviour {
 	[SerializeField] private int goldDropped; //how much gold to drop upon death
 	[SerializeField] private Animator animator; //sprite animator
 	[SerializeField] private AnimationClip hitAnimation; //animation when hit
-	[SerializeField] private Collider col;
-
+	[SerializeField] private Collider col; //collider of the enemy
 	private bool marked; //if the enemy is marked or not (marked enemies take more damage from certain elements)
 	private int markType; //the element that marked the enemy (will take more damage from all elements except this one)
 	private float markMultiplier; //the multiplier applied to mark damage
-	private float markDuration; //the duration of the mark effect
-
 	private bool alchemised; //if the enemy is being alchemised, it drops more gold as it dies
-	private float alchemisedDuration; //the duration of the alchemised effect
 	private float alchemyModifier; //the multiplier for gold dropped
-
 	private bool crystalised; //if the enemy is being crystalised, it drops more mana as it dies
-	private float crystalisedDuration; //the duraction of the crystalised effect
 	private float crystaliseModifier; // the multiplier for mana dropped
-
 	private float currentHP; //current hp of the enemy
 	private float[] resistances; //holds the resistances of the enemy
 	private Transform gameController; //transform always facing forwards (used to spawn damage text)
-
 	private bool disintegrating; //if the enemy is disintegrating, it drops no rewards
-	private float disintegrateDuration; //how long until the enemy is no longer disintegrating
-
 	private bool weakened; //if the enemy is weak to an element
 	private float weaknessModifier; //how much to effect the resistance
 	private int weaknessTo; //what element the enemy is weak to
-	private float weaknessDuration; //how long the enemy is weakened for
-
 	private bool hasDoT;  //if the enemy has a DoT effect on it
-	private float DoTDuration; //the duration of the DoT
-
-	private bool isDead;
+	private bool isDead; //if the enemy is dead
 
 	//initialises variables and references
 	void Start(){
@@ -62,24 +49,6 @@ public class EnemyStatController : MonoBehaviour {
 		resistances = new float[] { fireResistance, waterResistance, airResistance, earthResistance, orderResistance, chaosResistance, 0f};
 		textList = GameObject.Find ("DamageNumbersList").transform;
 		gameController = GameObject.Find ("GameController").transform;
-	}
-
-	//controls time based effects such as marks
-	void Update(){
-		if (!isDead) {
-			if (marked && Time.time > markDuration)
-				marked = false;
-			if (alchemised && Time.time > alchemisedDuration)
-				alchemised = false;
-			if (crystalised && Time.time > crystalisedDuration)
-				crystalised = false;
-			if (disintegrating && Time.time > disintegrateDuration)
-				disintegrating = false;
-			if (weakened && Time.time > weaknessDuration)
-				EndWeakness ();
-			if (hasDoT && Time.time > DoTDuration)
-				hasDoT = false;
-		}
 	}
 
 	//applies damage to the enemy
@@ -95,7 +64,8 @@ public class EnemyStatController : MonoBehaviour {
 
 		StartCoroutine (HitAnimation());
 
-		if (currentHP <= 0) Die ();
+        if (currentHP <= 0) Die();
+        else if (Random.Range(0f, 1f) < avoidanceController.AvoidanceChance()) avoidanceController.OnHit();
 	}
 
 	//kills the enemy, dropping rewards
@@ -155,25 +125,46 @@ public class EnemyStatController : MonoBehaviour {
 
 	//marks the enemy with an element, buffing all other elements' damage
 	public void Mark(int type, float multiplier){
-		marked = true;
-		markType = type;
-		markMultiplier = multiplier;
-		markDuration = Time.time + 5f;
+        StopCoroutine(MarkEffect(type, multiplier));
+        StartCoroutine(MarkEffect(type, multiplier));
 	}
+
+    //Coroutine to control mark duration
+    public IEnumerator MarkEffect(int type, float multiplier) {
+        marked = true;
+        markType = type;
+        markMultiplier = multiplier;
+        yield return new WaitForSeconds(5f);
+        marked = false;
+    }
 
 	//causes the enemy to drop more gold as it dies
 	public void Alchemise(float multiplier){
-		alchemised = true;
-		alchemisedDuration = Time.time + 1f;
-		alchemyModifier = multiplier;
+        StopCoroutine(AlchemiseEffect(multiplier));
+        StartCoroutine(AlchemiseEffect(multiplier));
 	}
 
-	//causes the enemy to drop more mana as it dies
-	public void Crystalise(float multiplier){
-		crystalised = true;
-		crystalisedDuration = Time.time + 1f;
-		crystaliseModifier = multiplier;
-	}
+    //Coroutine to control alchemise duration
+    public IEnumerator AlchemiseEffect(float multiplier) {
+        alchemised = true;
+        alchemyModifier = multiplier;
+        yield return new WaitForSeconds(1f);
+        alchemised = false;
+    }
+
+    //causes the enemy to drop more mana as it dies
+    public void Crystalise(float multiplier){
+        StopCoroutine(CrystaliseEffect(multiplier));
+        StartCoroutine(CrystaliseEffect(multiplier));
+    }
+
+    //Coroutine to control crystalise duration
+    public IEnumerator CrystaliseEffect(float multiplier) {
+        crystalised = true;
+        alchemyModifier = multiplier;
+        yield return new WaitForSeconds(1f);
+        crystalised = false;
+    }
 
 	//returns the health percentage
 	public float GetHealthPercent(){
@@ -187,20 +178,34 @@ public class EnemyStatController : MonoBehaviour {
 
 	//Takes extra damage but doesn't drop pickups
 	public void Disintegrate(){
-		disintegrating = true;
-		disintegrateDuration = Time.time + 5f;
-	}
+        StopCoroutine(DisintegrateEffect());
+        StartCoroutine(DisintegrateEffect());
+    }
+
+    //Coroutine to control disintegrating duration
+    public IEnumerator DisintegrateEffect() {
+        disintegrating = true;
+        yield return new WaitForSeconds(5f);
+        disintegrating = false;
+    }
 
 	//Lowers resistances
 	public void Weaken(int weakElement, int weakModifier){
-		if (!weakened) {
-			weakened = true;
-			weaknessTo = weakElement;
-			weaknessModifier = weakModifier;
-			resistances [weaknessTo] -= weaknessModifier;
-		}
-		weaknessDuration = Time.time + 5f;
-	}
+        if (weakened) EndWeakness();
+        StartCoroutine(WeakenEffect(weakElement, weakModifier));
+    }
+
+    //Coroutine to control weakness duration
+    public IEnumerator WeakenEffect(int weakElement, int weakModifier) {
+        weakened = true;
+        weaknessTo = weakElement;
+        weaknessModifier = weakModifier;
+        resistances[weaknessTo] -= weaknessModifier;
+        yield return new WaitForSeconds(5f);
+        weakened = false;
+        resistances[weaknessTo] += weaknessModifier;
+        weaknessModifier = 0f;
+    }
 
 	//Ends the weakness effect
 	private void EndWeakness(){
@@ -211,17 +216,14 @@ public class EnemyStatController : MonoBehaviour {
 
 	//Applies a DoT to the enemy
 	public void ApplyDoT(int damageType, float damage){
-		Debug.Log ("DOT");
-		if (!hasDoT) {
-			hasDoT = true;
-			StartCoroutine (DoT (damageType, damage, 1f));
-		}
-		DoTDuration = Time.time + 5.5f;
-	}
+        StopCoroutine(DoT(damageType, damage, 1f));
+        StartCoroutine(DoT(damageType, damage, 1f));
+    }
 
 	//Applies the DoT's effects
 	private IEnumerator DoT(int damageType, float damage, float interval){
-		while (hasDoT) {
+        float duration = Time.time + 5.5f;
+		while (Time.time < duration) {
 			yield return new WaitForSeconds (interval);
 			ApplyDamage(damage, damageType, false, true);
 		}
