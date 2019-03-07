@@ -10,6 +10,11 @@ public class EnemyNoAvoidance : MonoBehaviour, IEnemyAvoidanceController
     [SerializeField] private NavMeshAgent agent; //controls movement
     private Vector3 destination; //where the agent is going
 
+    //gives the enemy a reference to the room its in
+    public void SetRoom(RoomController room) {
+        //Not neccessary for this implementation
+    }
+
     //what to do when the enemy is hit
     public void OnHit() {
         //this implementation does not avoid, and so this method is empty

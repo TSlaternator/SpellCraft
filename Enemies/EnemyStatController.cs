@@ -49,6 +49,7 @@ public class EnemyStatController : MonoBehaviour {
 		resistances = new float[] { fireResistance, waterResistance, airResistance, earthResistance, orderResistance, chaosResistance, 0f};
 		textList = GameObject.Find ("DamageNumbersList").transform;
 		gameController = GameObject.Find ("GameController").transform;
+        avoidanceController = GetComponent<IEnemyAvoidanceController>();
 	}
 
 	//applies damage to the enemy

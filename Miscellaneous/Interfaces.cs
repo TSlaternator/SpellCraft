@@ -121,6 +121,9 @@ public interface IEnemyAvoidanceController {
 
     /* Controls enemy avoidance when hit by a projectile */
 
+    //gives the enemy a reference to the room its in
+    void SetRoom(RoomController room);
+
     //what to do when the enemy is hit
     void OnHit();
 

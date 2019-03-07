@@ -454,7 +454,8 @@ public class RoomController : MonoBehaviour
             zPos = Random.Range(zCentre - height / 2, zCentre + height / 2);
             spawnPoint = new Vector3 (xPos, 0f, zPos);
             if (NavMesh.SamplePosition(spawnPoint, out hit, 0.1f, NavMesh.AllAreas)) {
-                Instantiate(mob, spawnPoint, Quaternion.identity, enemiesList);
+                GameObject enemy = Instantiate(mob, spawnPoint, Quaternion.identity, enemiesList);
+                enemy.GetComponent<IEnemyAvoidanceController>().SetRoom(this);
                 spawned = true;
             } 
         }
@@ -581,6 +582,16 @@ public class RoomController : MonoBehaviour
     //gets the loot value of the room
     public int getLoot() {
         return (int)(loot * 100);
+    }
+
+    //gets the width of the room
+    public int getWidth() {
+        return width;
+    }
+
+    //gets the height of the room
+    public int getHeight() {
+        return height;
     }
 }
 

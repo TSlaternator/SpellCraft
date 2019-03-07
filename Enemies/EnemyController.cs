@@ -44,9 +44,10 @@ public class EnemyController : MonoBehaviour {
 	public bool isDead; //whether the enemy is dead or not
     private Vector3 destination; //where the enemy is going
     [SerializeField] private bool predictive; //whether the enemy predicts the players movement or not
+    private bool avoiding; //if the enemy is currently trying to avoid player projetiles
 
-	//initialising varibles
-	void Start () {
+    //initialising varibles
+    void Start () {
 		player = GameObject.FindGameObjectWithTag ("Player");
 		spellController = GetComponent<IEnemySpellController> ();
         moveController = GetComponent<IEnemyMoveController>();
@@ -62,20 +63,20 @@ public class EnemyController : MonoBehaviour {
 			moving = false;
 
 			if (!sleeping && !stunned) {
-				if (knockback) {
-					nextFire += Time.deltaTime;
-				} else if (snared) {
-					agent.SetDestination (transform.position);
-					if (Vector3.Magnitude (getPlayerPosition() - transform.position) < range && LineOfSight()) Cast ();
-				} else if (!avoidanceController.IsAvoiding()) {
-					if (Vector3.Magnitude (getPlayerPosition() - transform.position) < range && LineOfSight()) {
+                if (knockback) {
+                    nextFire += Time.deltaTime;
+                } else if (snared) {
+                    agent.SetDestination(transform.position);
+                    if (Vector3.Magnitude(getPlayerPosition() - transform.position) < range && LineOfSight()) Cast();
+                } else if (!avoidanceController.IsAvoiding()) {
+                    if (Vector3.Magnitude(getPlayerPosition() - transform.position) < range && LineOfSight() && Time.time > nextFire) {
                         agent.SetDestination(transform.position);
                         Cast();
-					} else {
-                        agent.SetDestination(moveController.getDestination(transform.position, player.transform.position, range)); 
+                    } else {
+                        agent.SetDestination(moveController.getDestination(transform.position, player.transform.position, range));
                         moving = true;
                     }
-				}
+                } else moving = true;
 				transform.LookAt (getPlayerPosition());
 			} else {
 				nextFire += Time.deltaTime;
