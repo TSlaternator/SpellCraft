@@ -134,3 +134,14 @@ public interface IEnemyAvoidanceController {
     bool IsAvoiding();
 }
 
+public interface IBossAttack {
+
+    /* Interface to control Bosses' attacks */
+
+    //casts the attack
+    void OnCast();
+
+    //gets the duration of the attack
+    float getCastDuration();
+}
+

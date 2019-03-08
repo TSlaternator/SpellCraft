@@ -14,6 +14,15 @@ public class BossRoomController : MonoBehaviour, IRoomTypeController {
     private float borderChance = 0.6f; //chances of spawning a border
     private float pillarChance = 0.1f; //chances of spawning a pillar at applicable points
     private float obstructionChance = 0.4f; //chances of spawning an obstruction at applicable points
+    private bool complete = false; //when true, rewards will spawn
+    private Transform enemies; //list of active enemies
+
+    //checks to see if the room is complete
+    void Update() {
+        if (explored && !complete) {
+            if (enemies.childCount == 0) OnRoomComplete();
+        }
+    }
 
     //called when the room is first spawned
     public void SpawnRoom(float xCentre, float zCentre, int width, int height) {
@@ -31,6 +40,8 @@ public class BossRoomController : MonoBehaviour, IRoomTypeController {
             tileController = GameObject.Find("LevelManager").GetComponent<TileMapController>();
             tileController.RemoveFog(xCentre, zCentre, width, height);
             GetComponent<RoomController>().AddToMiniMap();
+            enemies = GameObject.Find("EnemiesList").transform;
+            Instantiate(generator.bossRoom.mobs[0], transform.position + new Vector3(0f, 1f, 0f), Quaternion.identity, enemies);
         }
     }
 
@@ -41,7 +52,8 @@ public class BossRoomController : MonoBehaviour, IRoomTypeController {
 
     //controls what happens when the room is 'completed' (all enemies/boss killed)
     public void OnRoomComplete() {
-
+        complete = true;
+        //TODO
     }
 
     //gets the wall components for this room type

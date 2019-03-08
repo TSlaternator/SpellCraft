@@ -48,7 +48,7 @@ public class SubLevel{
 		else if ((float)height / (float)width >= 1.2f) splitHorizontal = true;
 		else splitHorizontal = Random.Range (0.0f, 1.0f) > 0.5f;
 
-		if ((Mathf.Min (height, width) / 2 )< minLevelSize) {
+		if ((Mathf.Max (height, width) / 3)< minLevelSize) {
 			return false;
 		}
 
@@ -80,8 +80,8 @@ public class SubLevel{
 			child2.CreateRoom ();
 		}
 		if (IsLeaf ()) {
-			roomWidth = (int)Random.Range (minRoomSize - 2, width - 4);
-			roomHeight = (int)Random.Range (minRoomSize - 2, height - 4);
+			roomWidth = (int)Random.Range (minRoomSize, width - 4);
+			roomHeight = (int)Random.Range (minRoomSize, height - 4);
             if (roomWidth % 2 != 0) roomWidth -= 1;
             if (roomHeight % 2 != 0) roomHeight -= 1;
 			room = new Room ((int)xCentre, (int)zCentre, roomWidth, roomHeight, depth);

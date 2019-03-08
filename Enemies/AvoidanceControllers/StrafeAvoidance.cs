@@ -10,11 +10,10 @@ public class StrafeAvoidance : MonoBehaviour, IEnemyAvoidanceController
     private Vector3 destination; //where the agent is going
     private Transform player; //the players position
     [SerializeField] private float strafeDistance; //how far to strafe
-    private RoomController room; //the roomController script of the room the enemy is in
 
     //gives the enemy a reference to the room its in
     public void SetRoom(RoomController room) {
-        this.room = room;
+        //Not neccessary for this implementation
     }
 
     //gets the players transform
