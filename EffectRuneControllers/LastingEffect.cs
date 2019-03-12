@@ -14,6 +14,20 @@ public class LastingEffect : MonoBehaviour, IEffectRune {
         }
     }
 
+    //Has a chance to apply the Rune's effect on the boss
+    public void ApplyEffect(BossStatController boss, SpellEffectController controller) {
+        if (Random.Range(0f, 1f) < DoTChance) {
+            boss.ApplyDoT(controller.GetDamageType(), controller.GetPower() * DoTDamage);
+        }
+    }
+
+    //Has a chance to apply the Runes effect on the boss' minion
+    public void ApplyEffect(EyerisMinionController minion, SpellEffectController controller) {
+        if (Random.Range(0f, 1f) < DoTChance) {
+            minion.ApplyDoT(controller.GetDamageType(), controller.GetPower() * DoTDamage);
+        }
+    }
+
     //Increases the potency of the rune (by increasing its effect, chance to proc, or both)
     public void IncreasePotency() {
         DoTChance += 0.08f;

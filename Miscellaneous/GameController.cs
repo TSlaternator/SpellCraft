@@ -5,9 +5,9 @@ using UnityEngine.UI;
 
 public class GameController : MonoBehaviour {
 
-	/* Controls overarching game effects */
+    /* Controls overarching game effects */
 
-	[SerializeField] private Texture2D cursorSprite; //new sprite to use as the in game cursor
+    [SerializeField] private Texture2D cursorSprite; //new sprite to use as the in game cursor
     [SerializeField] private GameObject chestUI; //UI for chests
     [SerializeField] private GameObject shopUI; //UI for the shop
     [SerializeField] private PauseMenu pauseMenu; //Pausemenu controller scripts
@@ -20,11 +20,14 @@ public class GameController : MonoBehaviour {
     [SerializeField] private Text playerMoneyText; //displays the players money in the shop UI
     [SerializeField] private Shrine[] shrineTypes; //holds the types of shrine that can appear in the game
     [SerializeField] private GameObject shrineUI; //holds the UI for shrines
+    [SerializeField] private GameObject bossHealthBar; //holds the UI for the bosses healthbar
+    [SerializeField] private Image bossHealth; //used in the healthbar
+    [SerializeField] private Image bossDamagedHealth; //used in the healthbar
 
     //sets the cursor to the custom one
-	void Start () {
-		Cursor.SetCursor (cursorSprite, Vector2.zero, CursorMode.Auto);
-	}
+    void Start() {
+        Cursor.SetCursor(cursorSprite, Vector2.zero, CursorMode.Auto);
+    }
 
     //gets the chest UI object
     public GameObject getChestUI() {
@@ -83,5 +86,20 @@ public class GameController : MonoBehaviour {
     //gets the shrineUI
     public GameObject getShrineUI() {
         return shrineUI;
+    }
+
+    //gets the health bar UI object
+    public GameObject getHealthBar() {
+        return bossHealthBar;
+    }
+
+    //gets the health image of the health UI object
+    public Image getHealthUI() {
+        return bossHealth;
+    }
+
+    //gets the damaged health image of the health UI object
+    public Image getDamagedHealthUI() {
+        return bossDamagedHealth;
     }
 }

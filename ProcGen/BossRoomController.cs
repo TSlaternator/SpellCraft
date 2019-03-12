@@ -12,7 +12,7 @@ public class BossRoomController : MonoBehaviour, IRoomTypeController {
     private int width, height; //dimensions of the room
     private float carpetChance = 0f; //chances of spawning a carpet
     private float borderChance = 0.6f; //chances of spawning a border
-    private float pillarChance = 0.1f; //chances of spawning a pillar at applicable points
+    private float pillarChance = 0f; //chances of spawning a pillar at applicable points
     private float obstructionChance = 0.4f; //chances of spawning an obstruction at applicable points
     private bool complete = false; //when true, rewards will spawn
     private Transform enemies; //list of active enemies

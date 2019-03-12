@@ -97,6 +97,12 @@ public interface IEffectRune {
     //applies the spell effect to the supplied game object
     void ApplyEffect(GameObject enemy, SpellEffectController controller);
 
+    //applies the spell effect to the supplied boss
+    void ApplyEffect(BossStatController boss, SpellEffectController contrller);
+
+    //applied the spell effect to the supplied boss' minion
+    void ApplyEffect(EyerisMinionController minion, SpellEffectController controller);
+
     //Increases the potency of the effect
     void IncreasePotency();
 }
@@ -141,7 +147,23 @@ public interface IBossAttack {
     //casts the attack
     void OnCast();
 
+    //casts a more aggressive version of the attack
+    void Phase2();
+
+    //stops the attack
+    void Stop();
+
     //gets the duration of the attack
     float getCastDuration();
 }
+
+public interface IBossSpecialAttack {
+
+    /* Each boss will have a special attack they can use in their second phase */
+
+    //uses the special attack
+    void OnCast();
+}
+
+
 

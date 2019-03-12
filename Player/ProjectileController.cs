@@ -91,6 +91,32 @@ public class ProjectileController : MonoBehaviour {
                         DestroyThis();
                     }
                 }
+            } else if (other.boss) {
+                other.GetComponent<BossStatController>().ApplyDamage(effectController.GetDamage(other.GetComponent<BossStatController>()), effectController.GetDamageType(), effectController.GetCrit(), false);
+                effectController.ApplyEffects(other.GetComponent<BossStatController>());
+                if (chaining && chainingTargets > 0) {
+                    guided = false;
+                    targetFound = false;
+                    effectController.ModifyDamage(0.67f);
+                    if (FindOtherTarget(other.gameObject) == false)
+                        seeking = true;
+                    else {
+                        DestroyThis();
+                    }
+                }
+            } else if (other.minion) {
+                other.GetComponent<EyerisMinionController>().ApplyDamage(effectController.GetDamage(other.GetComponent<BossStatController>()), effectController.GetDamageType(), effectController.GetCrit(), false);
+                effectController.ApplyEffects(other.GetComponent<EyerisMinionController>());
+                if (chaining && chainingTargets > 0) {
+                    guided = false;
+                    targetFound = false;
+                    effectController.ModifyDamage(0.67f);
+                    if (FindOtherTarget(other.gameObject) == false)
+                        seeking = true;
+                    else {
+                        DestroyThis();
+                    }
+                }
             }
 
             if (other.obstructing) {

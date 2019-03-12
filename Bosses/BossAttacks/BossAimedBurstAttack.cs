@@ -17,15 +17,19 @@ public class BossAimedBurstAttack : MonoBehaviour, IBossAttack {
     private float attackEndTime = 0; //when the attack will end
     private float nextFire = 0; //when the attack will fire the next projectile(s)
     private PlayerMoveController player; //the players transform
+    private BossController bossController; //used to check if the boss is dead or not
+    [SerializeField] private float phase2Speed; //speed of the projectiles fired in phase 2
+    [SerializeField] private float phase2FireRate; //speed of fire in phase2
 
     //gets the players transform
     void Start() {
         player = GameObject.Find("Player").GetComponent<PlayerMoveController>();
+        bossController = GetComponent<BossController>();
     }
 
     //controls the attack
     void Update() {
-        if (Time.time < attackEndTime) {
+        if (!bossController.IsDead() && Time.time < attackEndTime) {
             transform.LookAt(player.getFuturePosition());
             if (Time.time > nextFire) {
                 StartCoroutine(Cast());
@@ -40,9 +44,21 @@ public class BossAimedBurstAttack : MonoBehaviour, IBossAttack {
         nextFire = Time.time;
     }
 
+    //Makes the attack more aggressive
+    public void Phase2() {
+        speed = phase2Speed;
+        fireRate = phase2FireRate;
+    }
+
     //Gets the duration of the attack
     public float getCastDuration() {
         return castDuration;
+    }
+
+    //stops the attack
+    public void Stop() {
+        attackEndTime = Time.time - 0.1f;
+        animator.SetBool(animatorBool, false);
     }
 
     //casts a projectile, with animation

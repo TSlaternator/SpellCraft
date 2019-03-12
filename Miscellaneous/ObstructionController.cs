@@ -15,4 +15,6 @@ public class ObstructionController : MonoBehaviour {
 	public bool projectile; //whether the obstruction is a projectile
 	public bool blockingEthereal; //whether the obstruction is piercable by ethereal spells
 	public bool player; //whether the obstruction is the player
+    public bool boss; //whether the obstruction is a boss
+    public bool minion; //whether the obstruction is a boss' minion
 }

@@ -27,7 +27,7 @@ public class SpellEffectController : MonoBehaviour {
 	public float GetDamage(EnemyStatController enemy){
 
 		if (executing && enemy.GetHealthPercent() < executeThreshold) {
-			isCrit = false; //damage number colour should be normal *******MAYBE CHANGE THIS TO A RED COLOUR LATER***********
+			isCrit = false; //damage number colour should be normal
 			damageType = 6; //setting damage type to pure so enemy won't survive due to resistance
 			return enemy.GetHealth (); //returns current health of the enemy
 		} else {
@@ -43,6 +43,19 @@ public class SpellEffectController : MonoBehaviour {
 			}
 		}
 	}
+
+    //gets the damage done by the spell to bosses(called by bosses when they are hit)
+    public float GetDamage(BossStatController enemy) {
+        if (Random.Range(0f, 1f) < critChance) {
+            isCrit = true;
+            if (vorpal && Random.Range(0f, 1f) < vorpalChance) return (power + vorpalDamage) * (1 + critMultiplier) * (1 + Random.Range(-powerVariability, powerVariability))* RegicideMultiplier;
+            else return power * (1 + critMultiplier) * (1 + Random.Range(-powerVariability, powerVariability))* RegicideMultiplier;
+        } else {
+            isCrit = false;
+            if (vorpal && Random.Range(0f, 1f) < vorpalChance) return (power + vorpalDamage) * (1 + Random.Range(-powerVariability, powerVariability))* RegicideMultiplier;
+            else return power * (1 + Random.Range(-powerVariability, powerVariability))* RegicideMultiplier;
+        }
+    }
 
     //sets the stats of the spell (called when it's instantiated
     public void setStats(float power, float impact, float critChance, float critMultiplier) {
@@ -85,8 +98,24 @@ public class SpellEffectController : MonoBehaviour {
         }
 	}
 
+    //Applies the spells effects when hitting a target
+    public void ApplyEffects(BossStatController boss) {
+        IEffectRune[] effects = GetComponents<IEffectRune>();
+        for (int i = 0; i < effects.Length; i++) {
+            effects[i].ApplyEffect(boss, this);
+        }
+    }
+
+    //Applies the spells effects when hitting a target
+    public void ApplyEffects(EyerisMinionController boss) {
+        IEffectRune[] effects = GetComponents<IEffectRune>();
+        for (int i = 0; i < effects.Length; i++) {
+            effects[i].ApplyEffect(boss, this);
+        }
+    }
+
     //Destroys the spell, applying any death effects (such as exploding)
-	public void ApplyDeathEffects(){
+    public void ApplyDeathEffects(){
 		if (explosive) {
 			GameObject explosionController = Instantiate (explosion, transform.position, transform.rotation);
 			explosionController.GetComponent<ExplosionController> ().SetDamage (explosionDamage);

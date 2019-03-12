@@ -16,15 +16,25 @@ public class BossSpiralAttack : MonoBehaviour, IBossAttack
     [SerializeField] private Animator animator; //animator attached to the AI
     private float attackEndTime; //when the attack will end
     private float nextFire; //when the attack will fire the next projectile(s)
+    private BossController bossController; //used to check if the boss is dead or not
+    [SerializeField] private float rotationSpeed; //the speed the attack rotates at
+    [SerializeField] private float phase2Speed; //speed of the projectiles fired in phase 2
+    [SerializeField] private float phase2FireRate; //speed of fire in phase2
+    [SerializeField] private float phase2RotationSpeed; //the speed the attack rotates at
+
+    //initialising
+    void Start() {
+        bossController = GetComponent<BossController>();
+    }
 
     //controls the attack
     void Update() {
-        if (Time.time < attackEndTime) {
+        if (!bossController.IsDead() && Time.time < attackEndTime) {
             if (Time.time > nextFire) {
                 for (int i = 0; i < castPoints.Length; i++) {
                     CastProjectile(i); 
                 }
-                transform.RotateAround(transform.position, transform.up, 5f);
+                transform.RotateAround(transform.position, transform.up, rotationSpeed);
                 nextFire += fireRate;
             }
         }
@@ -42,6 +52,19 @@ public class BossSpiralAttack : MonoBehaviour, IBossAttack
         attackEndTime = Time.time + castDuration;
         nextFire = Time.time;
         StartCoroutine(Animate());
+    }
+
+    //Makes the attack more aggressive
+    public void Phase2() {
+        speed = phase2Speed;
+        fireRate = phase2FireRate;
+        rotationSpeed = phase2RotationSpeed;
+    }
+
+    //stops the attack
+    public void Stop() {
+        attackEndTime = Time.time - 0.1f;
+        animator.SetBool(animatorBool, false);
     }
 
     //Gets the duration of the attack
